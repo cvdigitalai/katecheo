@@ -7,7 +7,6 @@ import urllib2
 class KBSearch(object):
   SEARCH = 0
   TOPIC = 1
-  MATCH_CONFIDENCE_THRESHOLD = 50 # todo: change this value later
 
   available_topics = []
 
