@@ -1,0 +1,62 @@
+{
+    "apiVersion": "machinelearning.seldon.io/v1alpha2",
+    "kind": "SeldonDeployment",
+    "metadata": {
+        "labels": {
+            "app": "seldon"
+        },
+        "name": "gq-search"
+    },
+    "spec": {
+        "annotations": {
+            "project_name": "GQ Search",
+            "deployment_version": "v1",
+	    "seldon.io/rest-read-timeout":"100000",
+	    "seldon.io/rest-connection-timeout":"100000",
+	    "seldon.io/grpc-read-timeout":"100000"
+        },
+        "name": "gq-search",
+        "oauth_key": "oauth-key",
+        "oauth_secret": "oauth-secret",
+        "predictors": [
+            {
+                "componentSpecs": [{
+                    "spec": {
+                        "imagePullSecrets": [
+                            {
+                                "name": "regcred"
+                            }
+                        ],
+                        "containers": [
+                            {
+                                "image": "cvdigital/gq_search:v0.02",
+                                "imagePullPolicy": "Always",
+                                "name": "classifier",
+                                "resources": {
+                                    "requests": {
+                                        "memory": "500Mi"
+                                    }
+                                }
+                            }
+                        ],
+                        "terminationGracePeriodSeconds": 20
+                    }
+                }],
+                "graph": {
+                    "children": [],
+                    "name": "classifier",
+                    "endpoint": {
+            "type" : "REST"
+            },
+                    "type": "MODEL"
+                },
+                "name": "single-model",
+                "replicas": 1,
+        "annotations": {
+            "predictor_version" : "v1"
+        }
+            }
+        ]
+    }
+}
+
