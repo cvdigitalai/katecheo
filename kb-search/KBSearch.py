@@ -9,6 +9,9 @@ class KBSearch(object):
   TOPIC = 1
 
   available_topics = []
+  recordsDict = {}
+  recordsArray = []
+  titles = []
 
   def __init__(self):
     # This is format of injected env var
@@ -22,6 +25,18 @@ class KBSearch(object):
       self.available_topics.append(parts[0])
       self.downloadFile(parts[1])
 
+    for topic in self.available_topics:
+      filename = 'kb_' + topic + '.json'
+
+      with open(filename) as json_file:  
+        self.recordsArray = json.load(json_file)
+
+        self.recordsDict = {}
+        for element in self.recordsArray:
+          self.recordsDict[element['title']] = element
+
+        self.titles = self.recordsDict.keys()
+
 
   def downloadFile(self, url):
     filename = os.path.basename(url)
@@ -33,29 +48,16 @@ class KBSearch(object):
     fh.close()
     return
 
+
   def predict(self, X, features_names):
-    response = {'title': '12'}
+    response = {}
 
     if X[self.TOPIC] in self.available_topics:
-      filename = 'kb_' + X[self.TOPIC] + '.json'
-
-      with open(filename) as json_file:  
-        recordsArray = json.load(json_file)
-
-        recordsDict = {}
-        for element in recordsArray:
-          recordsDict[element['title']] = element
-
-        titles = []
-        for index, rec in enumerate(recordsArray):
-          titles.append(rec['title'])
-
-        ret = process.extractOne(X[self.SEARCH], titles, scorer=fuzz.ratio)
-        response = recordsDict[ret[0]]
-
+        ret = process.extractOne(X[self.SEARCH], self.titles, scorer=fuzz.ratio)
+        response = self.recordsDict[ret[0]]
     else:
       response = {
-        "error": 'Topic: ' + X[self.TOPIC] + ' not found'
+        "error": 'KBSearch/predict - Topic: ' + X[self.TOPIC] + ' not found'
       }
 
     return json.dumps(response)
