@@ -5,9 +5,9 @@
 From this comprehension directory:
 
 ```
-$ s2i build . seldonio/seldon-core-s2i-python3:0.7 dwhitena/question-detector:v0.1
+$ s2i build . seldonio/seldon-core-s2i-python3:0.7 cvdigital/question-detector:v0.1
 
-$ docker push dwhitena/question-detector:v0.1
+$ docker push cvdigital/question-detector:v0.1
 ```
 
 ## API
@@ -31,7 +31,7 @@ Example response:
     "routing": {
     },
     "requestPath": {
-      "classifier": "dwhitena/question-detector:v0.1"
+      "classifier": "cvdigital/question-detector:v0.1"
     },
     "metrics": []
   },
