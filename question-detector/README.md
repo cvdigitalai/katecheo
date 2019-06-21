@@ -5,9 +5,9 @@
 From this comprehension directory:
 
 ```
-$ s2i build . seldonio/seldon-core-s2i-python37:0.8 cvdigital/question-detector:v0.1
+$ s2i build . seldonio/seldon-core-s2i-python37:0.8 cvdigital/question-detector-model:v0.1
 
-$ docker push cvdigital/question-detector:v0.1
+$ docker push cvdigital/question-detector-model:v0.1
 ```
 
 ## API
@@ -31,11 +31,10 @@ Example response:
     "routing": {
     },
     "requestPath": {
-      "classifier": "cvdigital/question-detector:v0.1"
+      "classifier": "cvdigital/question-detector-model:v0.1"
     },
     "metrics": []
   },
   "strData": "{\"text\": \"what does the bible say about tattoos ?\", \"question\": true}"
 }
 ```
-

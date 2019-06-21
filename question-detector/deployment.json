@@ -21,7 +21,7 @@
                     "spec": {
                         "containers": [
                             {
-                                "image": "cvdigital/question-detector:v0.1",
+                                "image": "cvdigital/question-detector-model:v0.1",
                                 "imagePullPolicy": "IfNotPresent",
                                 "name": "classifier",
                                 "resources": {
