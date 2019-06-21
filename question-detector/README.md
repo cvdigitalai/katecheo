@@ -5,7 +5,7 @@
 From this comprehension directory:
 
 ```
-$ s2i build . seldonio/seldon-core-s2i-python3:0.7 cvdigital/question-detector:v0.1
+$ s2i build . seldonio/seldon-core-s2i-python37:0.8 cvdigital/question-detector:v0.1
 
 $ docker push cvdigital/question-detector:v0.1
 ```
