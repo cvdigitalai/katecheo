@@ -5,9 +5,9 @@
 From this comprehension directory:
 
 ```
-$ s2i build . seldonio/seldon-core-s2i-python3:0.7 dwhitena/target-classifier:v0.1
+$ s2i build . seldonio/seldon-core-s2i-python3:0.7 cvdigital/target-classifier-multi:v0.1
 
-$ docker push dwhitena/target-classifier:v0.1
+$ docker push cvdigital/target-classifier-multi:v0.1
 ```
 
 ## API
@@ -31,7 +31,7 @@ Example response:
     "routing": {
     },
     "requestPath": {
-      "classifier": "dwhitena/target-classifier:v0.1"
+      "classifier": "cvdigital/target-classifier:v0.1"
     },
     "metrics": []
   },

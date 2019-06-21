@@ -21,7 +21,7 @@
                     "spec": {
                         "containers": [
                             {
-                                "image": "dwhitena/target-classifier:v0.1",
+                                "image": "cvdigital/target-classifier-multi:v0.1",
                                 "imagePullPolicy": "IfNotPresent",
                                 "name": "classifier",
                                 "resources": {
