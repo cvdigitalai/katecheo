@@ -7,6 +7,20 @@ import KBSearch
 search = KBSearch.KBSearch()
 
 params = [
+  'Life Belt or Lifeboat',
+  'faith'
+]
+
+response = search.predict(params, "features")
+obj = json.loads(response)
+if response:
+  print('Found this TITLE: ' + obj['title'] + ', BODY: ' + obj['body'])
+else:
+  print('Not found')
+
+print("*******************")
+
+params = [
   'Why are the estimates of obesity prevalence in England wildly different?',
   'health'
 ]
@@ -14,6 +28,6 @@ params = [
 response = search.predict(params, "features")
 obj = json.loads(response)
 if response:
-  print('Found this TITLE: ' + obj['title'] + ', BODY' + obj['body'])
+  print('Found this TITLE: ' + obj['title'] + ', BODY: ' + obj['body'])
 else:
   print('Not found')

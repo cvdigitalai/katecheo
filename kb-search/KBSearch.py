@@ -2,7 +2,7 @@ from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 import json
 import os
-import urllib2
+import urllib.request
 
 class KBSearch(object):
   SEARCH = 0
@@ -11,7 +11,7 @@ class KBSearch(object):
   available_topics = []
   recordsDict = {}
   recordsArray = []
-  titles = []
+  titles = {}
 
   def __init__(self):
     # This is format of injected env var
@@ -25,39 +25,41 @@ class KBSearch(object):
       self.available_topics.append(parts[0])
       self.downloadFile(parts[1])
 
+    self.recordsDict = {}
     for topic in self.available_topics:
       filename = 'kb_' + topic + '.json'
 
-      with open(filename) as json_file:  
+      with open(filename) as json_file:
         self.recordsArray = json.load(json_file)
 
-        self.recordsDict = {}
+        self.recordsDict[topic] = {}
         for element in self.recordsArray:
-          self.recordsDict[element['title']] = element
+          self.recordsDict[topic][element['title']] = element
 
-        self.titles = self.recordsDict.keys()
+        self.titles[topic] = list(self.recordsDict[topic].keys())
 
 
   def downloadFile(self, url):
     filename = os.path.basename(url)
-    fh = open(filename, "w")
-
-    content = urllib2.urlopen(url)
-    fh.write(content.read())
-
-    fh.close()
+    urllib.request.urlretrieve(url, filename)
     return
 
 
   def predict(self, X, features_names):
     response = {}
 
-    if X[self.TOPIC] in self.available_topics:
-        ret = process.extractOne(X[self.SEARCH], self.titles, scorer=fuzz.ratio)
-        response = self.recordsDict[ret[0]]
-    else:
-      response = {
-        "error": 'KBSearch/predict - Topic: ' + X[self.TOPIC] + ' not found'
-      }
+
+    try:
+      if X[self.TOPIC] in self.available_topics:
+          ret = process.extractOne(X[self.SEARCH], self.titles[X[self.TOPIC]], scorer=fuzz.ratio)
+          response = self.recordsDict[X[self.TOPIC]][ret[0]]
+      else:
+        response = {
+          "error": 'KBSearch/predict - Topic: ' + X[self.TOPIC] + ' not found'
+        }
+    except KeyError:
+        response = {
+          "error": 'KBSearch/predict - Key error'
+        }
 
     return json.dumps(response)
