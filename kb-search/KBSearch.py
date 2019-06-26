@@ -3,6 +3,7 @@ from fuzzywuzzy import process
 import json
 import os
 import urllib.request
+import numpy as np
 
 class KBSearch(object):
   SEARCH = 0
@@ -44,22 +45,32 @@ class KBSearch(object):
     urllib.request.urlretrieve(url, filename)
     return
 
+  def predict(self, X, features_names, meta):
 
-  def predict(self, X, features_names):
-    response = {}
+    # logic from parent
+    if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags']['proceed']:
 
+        try:
+            if meta['tags']['topic'] in self.available_topics:
+                ret = process.extractOne(X[self.SEARCH], self.titles[meta['tags']['topic']], scorer=fuzz.ratio)
+                X = np.append([self.recordsDict[meta['tags']['topic']][ret[0]]['body']], X)
+                self.result = meta['tags']
+                return X
+            else:
+                self.result = meta['tags']
+                self.result['proceed'] = False
+                self.result['point_of_failure'] = 'KB for topic \"' + meta['tags']['topic'] + '\" not found'
+                return X
+        
+        except KeyError:
+            self.result = meta['tags']
+            self.result['proceed'] = False
+            self.result['point_of_failure'] = 'KB key error'
+            return X
 
-    try:
-      if X[self.TOPIC] in self.available_topics:
-          ret = process.extractOne(X[self.SEARCH], self.titles[X[self.TOPIC]], scorer=fuzz.ratio)
-          response = self.recordsDict[X[self.TOPIC]][ret[0]]
-      else:
-        response = {
-          "error": 'KBSearch/predict - Topic: ' + X[self.TOPIC] + ' not found'
-        }
-    except KeyError:
-        response = {
-          "error": 'KBSearch/predict - Key error'
-        }
+    else:
+        self.result = meta['tags']
+        return X
 
-    return json.dumps(response)
+  def tags(self):
+      return self.result
