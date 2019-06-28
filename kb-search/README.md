@@ -1,41 +1,15 @@
 # kb-search
 
-## To build
-
-From this comprehension directory:
+## Build
 
 ```
-$ s2i build . seldonio/seldon-core-s2i-python3:0.7 cvdigital/gq_search:v0.02
-
-$ docker push cvdigital/gq_search:v0.02
+$ s2i build . seldonio/seldon-core-s2i-python3:0.7 cvdigital/kb_search:v0.02
+$ docker push cvdigital/kb_search:v0.02
 ```
 
-## API
-
-Example request:
+## Test
 
 ```
-$ curl -X POST -H 'Content-Type: application/json' \
-    -d '{"data": {"names": ["kb", "q"], "ndarray": ["What does the Bible say about tattoos"]}}' \
-    http://35.201.10.193/seldon/default/gq-search/api/v0.1/predictions
+$ docker run -it cvdigital/kb_search:v0.02 --rm -p 5001:5000
+$ curl -g http://localhost:5001/predict --data-urlencode 'json={"data": {"names": ["message"], "ndarray": ["Does some food increase pollen allergy symptoms?"]}}'
 ```
-
-Example response:
-
-```
-{
-  "meta": {
-    "puid": "vs2episkdug9l1mloilmht4uqa",
-    "tags": {
-    },
-    "routing": {
-    },
-    "requestPath": {
-      "classifier": "cvdigital/gq_search:v0.02"
-    },
-    "metrics": []
-  },
-  "strData": "{\"id\": \"666\", \"confidence\": 99, \"article_title\": \"What does the Bible say about tattoos?\"}"
-}
-```
-
