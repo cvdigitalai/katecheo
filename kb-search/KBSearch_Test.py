@@ -17,20 +17,15 @@ class KBSearch_Test(unittest.TestCase):
     def test_topic_health(self):
         params = ['Does some food increase pollen allergy symptoms?', 'health']
 
-        response = self.search.predict(params, "features", {'tags': {'proceed': True}})
+        response = self.search.predict(params, "features", {'tags': {'proceed': True, "topic": "faith"}})
         self.assertIsNotNone(response)
-        obj = json.loads(response)
-        if 'error' in obj:
-            self.assertTrue(False, obj)
 
     def test_topic_faith(self):
         params = ['Life Belt or Lifeboat', 'faith']
 
-        response = self.search.predict(params, "features")
+        response = self.search.predict(params, "features", {'tags': {'proceed': True, "topic": "faith"}})
         self.assertIsNotNone(response)
-        obj = json.loads(response)
-        if 'error' in obj:
-            self.assertTrue(False, obj)
+
 
 if __name__ == '__main__':
     unittest.main()

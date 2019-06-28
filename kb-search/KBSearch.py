@@ -1,6 +1,7 @@
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 import json
+import numpy as np
 import os
 import urllib.request
 
@@ -106,27 +107,31 @@ class KBSearch(object):
                 # Try matching each record's title field with search phrase
                 didNotMatchAvailableTopics = True
                 for kb in self.availableKB:
-                    if X[self.TOPIC] == kb['topic']:
+                    if meta['tags']['topic'] == kb['topic']:
                         didNotMatchAvailableTopics = False
                         ret = process.extractOne(X[self.SEARCH_PHRASE],
-                                                self.titles[X[self.TOPIC]],
+                                                self.titles[meta['tags']['topic']],
                                                 scorer=fuzz.ratio)
-                        response = self.records[X[self.TOPIC]][ret[0]]
+                        X = np.append([self.records[meta['tags']['topic']][ret[0]]['body']], X)
+                        self.result = meta['tags']
+                        return X
 
                 # Notify caller that something went wrong
                 if didNotMatchAvailableTopics:
-                    response = {
-                        "error":
-                        'KBSearch/predict - Topic: ' + X[self.TOPIC] + ' not found'
-                    }
-            except KeyError:
-                response = {"error": 'KBSearch/predict - Key error'}
+                    self.result = meta['tags']
+                    self.result['proceed'] = False
+                    self.result['point_of_failure'] = 'KB for topic \"' + meta['tags']['topic'] + '\" not found'
+                    return X
 
-            return json.dumps(response)
+            except KeyError:
+                self.result = meta['tags']
+                self.result['proceed'] = False
+                self.result['point_of_failure'] = 'KB key error'
+                return X
 
         else:
             self.result = meta['tags']
-            return ''
+            return X
 
     def tags(self):
         return self.result
