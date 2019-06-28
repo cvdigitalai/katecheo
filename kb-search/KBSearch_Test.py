@@ -17,7 +17,7 @@ class KBSearch_Test(unittest.TestCase):
     def test_topic_health(self):
         params = ['Does some food increase pollen allergy symptoms?', 'health']
 
-        response = self.search.predict(params, "features")
+        response = self.search.predict(params, "features", {'tags': {'proceed': True}})
         self.assertIsNotNone(response)
         obj = json.loads(response)
         if 'error' in obj:

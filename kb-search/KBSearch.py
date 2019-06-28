@@ -17,6 +17,7 @@ class KBSearch(object):
     availableKB = []
     records = {}
     titles = {}
+    result = {}
 
     def __init__(self):
         """
@@ -81,7 +82,7 @@ class KBSearch(object):
         urllib.request.urlretrieve(url, os.path.basename(url))
         return
 
-    def predict(self, X, features_names):
+    def predict(self, X, features_names, meta):
         """
         Searches for a phrase in topic's knowledge base list using FuzzyWuzzy matching
 
@@ -99,24 +100,33 @@ class KBSearch(object):
         """
         response = {}
 
-        try:
-            # Try matching each record's title field with search phrase
-            didNotMatchAvailableTopics = True
-            for kb in self.availableKB:
-                if X[self.TOPIC] == kb['topic']:
-                    didNotMatchAvailableTopics = False
-                    ret = process.extractOne(X[self.SEARCH_PHRASE],
-                                            self.titles[X[self.TOPIC]],
-                                            scorer=fuzz.ratio)
-                    response = self.records[X[self.TOPIC]][ret[0]]
+        # Logic from parent
+        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags']['proceed']:
+            try:
+                # Try matching each record's title field with search phrase
+                didNotMatchAvailableTopics = True
+                for kb in self.availableKB:
+                    if X[self.TOPIC] == kb['topic']:
+                        didNotMatchAvailableTopics = False
+                        ret = process.extractOne(X[self.SEARCH_PHRASE],
+                                                self.titles[X[self.TOPIC]],
+                                                scorer=fuzz.ratio)
+                        response = self.records[X[self.TOPIC]][ret[0]]
 
-            # Notify caller that something went wrong
-            if didNotMatchAvailableTopics:
-                response = {
-                    "error":
-                    'KBSearch/predict - Topic: ' + X[self.TOPIC] + ' not found'
-                }
-        except KeyError:
-            response = {"error": 'KBSearch/predict - Key error'}
+                # Notify caller that something went wrong
+                if didNotMatchAvailableTopics:
+                    response = {
+                        "error":
+                        'KBSearch/predict - Topic: ' + X[self.TOPIC] + ' not found'
+                    }
+            except KeyError:
+                response = {"error": 'KBSearch/predict - Key error'}
 
-        return json.dumps(response)
+            return json.dumps(response)
+
+        else:
+            self.result = meta['tags']
+            return ''
+
+    def tags(self):
+        return self.result
