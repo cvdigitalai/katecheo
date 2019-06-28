@@ -21,7 +21,6 @@ class TargetClassifier(object):
       modelName = modelInfo[0]
       modelURL = modelInfo[1]
       
-      # TODO - pull model from GCS with authenticated client
       # Download the model
       modelRootDirectory = "./" + modelName
 
@@ -43,29 +42,43 @@ class TargetClassifier(object):
 
     self.models = nlpModels
     
-  def predict(self,X,feature_names):
+  def predict(self, X, feature_names, meta):
 
-    topicName = ""
-    matchedEntities = []
-    
-    # Get the text string that is to be classified.
-    messageText = str(X[0])
+    # logic from parent
+    if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags']['proceed']:
+        
+        topicName = ""
+        matchedEntities = []
 
-    # Iterate through all the models
-    for topic, model in self.models.items():
+        # Get the text string that is to be classified.
+        messageText = str(X[0])
 
-      # Get the inference result from the NER model for a question.
-      doc = model(messageText)
+        # Iterate through all the models
+        for topic, model in self.models.items():
 
-      # Check if the model has recognised the trained entities in the question.
-      if doc.ents:
-        topicName = topic
-        matchedEntities.append(doc.ents)
+            # Get the inference result from the NER model for a question.
+            doc = model(messageText)
 
-    # TODO: List out all the topics with a percentage of the match confidence.
-    # Currently we would like to return classification result
-    # only if it matches a single topic.
-    if len(matchedEntities) == 1:
-      return str({"topic": topicName, "message": messageText})
+            # Check if the model has recognised the trained entities in the question.
+            if doc.ents:
+                topicName = topic
+                matchedEntities.append(doc.ents)
 
-    return str({"topic": '', "message": messageText})
+        # TODO: List out all the topics with a percentage of the match confidence.
+        # Currently we would like to return classification result
+        # only if it matches a single topic.
+        if len(matchedEntities) == 1:
+            self.result = {'proceed':True}
+            self.result['topic'] = topicName
+            return X
+        else:
+            self.result = {'proceed':False}
+            self.result['point_of_failure'] = 'No Matching Topic'
+            return X
+
+    else:
+        self.result = meta['tags']
+        return X
+
+  def tags(self):
+      return self.result
