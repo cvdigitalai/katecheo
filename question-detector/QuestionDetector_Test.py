@@ -10,7 +10,7 @@ class QuestionDetector_Test(unittest.TestCase):
     def setUp(self):
         self.question = QuestionDetector.QuestionDetector()
 
-    def test_topic_health(self):
+    def test_if_question(self):
         params = ['Does some food increase pollen allergy symptoms?']
 
         response = self.question.predict(params, "features")

@@ -1,41 +1,22 @@
 # target-classifier
 
-## To build
-
-From this comprehension directory:
+## Build
 
 ```
 $ s2i build . seldonio/seldon-core-s2i-python3:0.7 cvdigital/target-classifier-multi:v0.1
-
 $ docker push cvdigital/target-classifier-multi:v0.1
 ```
 
-## API
-
-Example request:
+## Test
 
 ```
-$ curl -X POST -H 'Content-Type: application/json' \
-    -d '{"data": {"names": ["message"], "ndarray": ["What does the Bible say about tattoos"]}}' \
-    http://35.201.10.193/seldon/default/target-classifier/api/v0.1/predictions
+$ docker run --env KATECHEO_NER='health=https://storage.googleapis.com/pachyderm-neuralbot/ner_models/health.zip,faith=https://storage.googleapis.com/pachyderm-neuralbot/ner_models/faith.zip' --rm cvdigital/target-classifier-multi:v0.1
+$ docker exec -it <CONTAINER_ID> python TargetClassifier_Test.py
 ```
 
-Example response:
+## Usage
 
 ```
-{
-  "meta": {
-    "puid": "621fkb3colis0o0h0b19jau01j",
-    "tags": {
-    },
-    "routing": {
-    },
-    "requestPath": {
-      "classifier": "cvdigital/target-classifier:v0.1"
-    },
-    "metrics": []
-  },
-  "strData": "True"
-}
+$ docker run --env KATECHEO_NER='health=https://storage.googleapis.com/pachyderm-neuralbot/ner_models/health.zip,faith=https://storage.googleapis.com/pachyderm-neuralbot/ner_models/faith.zip' --rm -p 5001:5000 cvdigital/target-classifier-multi:v0.1
+$ curl -g http://localhost:5001/predict --data-urlencode 'json={"data": {"names": ["message"], "ndarray": ["Does some food increase pollen allergy symptoms?"]}, "meta": {"tags":{"proceed":true}}}'
 ```
-
