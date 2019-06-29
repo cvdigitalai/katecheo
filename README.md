@@ -1,11 +1,11 @@
-![alt text](logo.png)
+![alt text](Katecho_logo.png)
 
 Katecheo is a modular system for topical question answering built on Kubernetes. It is portable to any Kubernetes cluster (in the cloud or on-prem), and it allows developers to integrate state-of-the-art questions answering into their applications via its REST API.  
 
 You can learn more about Katecheo in:
 
-- This blog post
-- other
+- This this screencast
+- Our EMNLP 2019 system submission (coming soon)
 
 ## Deploy Katecheo
 
@@ -29,18 +29,8 @@ In summary, you will need:
 ### Deploy KubeQuest
 
 ```
-$ kubectl apply -f comprehension/deployment.json
-
-$ kubectl apply -f target-classifier/deployment.json
-
-$ kubectl apply -f kb-search/deployment.json
-
-$ kubectl apply -f question-detector/deployment.json
+$ cd deploy && ./deploy.sh
 ```
-
-## Authentication
-
-coming soon...
 
 ## Future extensions
 
@@ -49,3 +39,6 @@ In the future we intend to:
 - Document how Katecheo can be used for multi-topic question answering
 - Extend topic classification beyond the currently methodology, which relies on spacy NER models
 - Integrate full text search for knowledge base article matching
+
+___
+All material is licensed under the [Apache License Version 2.0, January 2004](http://www.apache.org/licenses/LICENSE-2.0).
