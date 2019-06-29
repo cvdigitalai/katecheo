@@ -1,4 +1,4 @@
-# Katecheo
+![alt text](logo.png)
 
 Katecheo is a modular system for topical question answering built on Kubernetes. It is portable to any Kubernetes cluster (in the cloud or on-prem), and it allows developers to integrate state-of-the-art questions answering into their applications via its REST API.  
 
