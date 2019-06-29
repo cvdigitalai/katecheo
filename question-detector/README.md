@@ -1,41 +1,22 @@
 # question-detector
 
-## To build
-
-From this comprehension directory:
+## Build
 
 ```
-$ s2i build . seldonio/seldon-core-s2i-python3:0.7 cvdigital/question-detector:v0.1
-
-$ docker push cvdigital/question-detector:v0.1
+$ s2i build . seldonio/seldon-core-s2i-python3:0.7 cvdigital/question-detector:v0.02
+$ docker push cvdigital/question-detector:v0.02
 ```
 
-## API
-
-Example request:
+## Test
 
 ```
-$ curl -X POST -H 'Content-Type: application/json' \
-    -d '{"data": {"names": ["message"], "ndarray": ["What does the Bible say about tattoos"]}}' \
-    http://35.201.10.193/seldon/default/question-detector/api/v0.1/predictions
+$ docker run --rm cvdigital/question-detector:v0.02
+# docker exec -it <CONTAINER_ID> python QuestionDetector_Test.py
 ```
 
-Example response:
+## Usage
 
 ```
-{
-  "meta": {
-    "puid": "q2nc7mbs08nuabtt7h6ma84g1s",
-    "tags": {
-    },
-    "routing": {
-    },
-    "requestPath": {
-      "classifier": "cvdigital/question-detector:v0.1"
-    },
-    "metrics": []
-  },
-  "strData": "{\"text\": \"what does the bible say about tattoos ?\", \"question\": true}"
-}
+$ docker run --env --rm -p 5001:5000 cvdigital/question-detector:v0.02
+$ curl -g http://localhost:5001/predict --data-urlencode 'json={"data": {"names": ["message"], "ndarray": ["Does some food increase pollen allergy symptoms?"]}}'
 ```
-
