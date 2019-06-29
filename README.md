@@ -13,9 +13,9 @@ You can learn more about Katecheo in:
 
 Katecheo runs on Kubernetes and utilizes Seldon to serve predictions. You will need:
 
-- A Kubernetes cluster (see here for more information)
-- Seldon deployed on the Kubernetes cluster (see here for more info about Seldon)
-- Ambassator or Istio installed on the Kubernetes cluster (see here for more info)
+- A Kubernetes cluster (see [here](https://kubernetes.io/docs/home/) for more information)
+- Seldon deployed on the Kubernetes cluster (see [here](https://docs.seldon.io/projects/seldon-core/en/latest/workflow/install.html) for more info about Seldon)
+- Ambassator or Istio installed on the Kubernetes cluster (see [here](https://docs.seldon.io/projects/seldon-core/en/latest/workflow/install.html#install-an-ingress-gateway) for more info)
 
 ### Data/model Preparation
 
