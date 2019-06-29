@@ -73,68 +73,6 @@ class TargetClassifier(object):
             messageText = str(X[0])
 
             # Iterate through all the models
-            """
-            TODO: 'model' is causing a crash. Needs fix ASAP.
-            I'm blocking the offending part of the code to get other things done like code formatting, comments, tests, etc
-            ---
-                        ======================================================================
-                        ERROR: test_get_topic (__main__.TargetClassifier_Test)
-                        ----------------------------------------------------------------------
-                        Traceback (most recent call last):
-                        File "TargetClassifier_Test.py", line 19, in test_get_topic
-                            response = self.classifier.predict(params, "features", {'tags': {'proceed': True}})
-                        File "/Users/shirish/workarea/katecheo/target-classifier/TargetClassifier.py", line 83, in predict
-                            doc = model(messageText)
-                        File "/anaconda3/lib/python3.7/site-packages/spacy/language.py", line 390, in __call__
-                            doc = proc(doc, **component_cfg.get(name, {}))
-                        File "nn_parser.pyx", line 205, in spacy.syntax.nn_parser.Parser.__call__
-                        File "nn_parser.pyx", line 244, in spacy.syntax.nn_parser.Parser.predict
-                        File "nn_parser.pyx", line 257, in spacy.syntax.nn_parser.Parser.greedy_parse
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/neural/_classes/model.py", line 165, in __call__
-                            return self.predict(x)
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/neural/_classes/model.py", line 129, in predict
-                            y, _ = self.begin_update(X, drop=None)
-                        File "_parser_model.pyx", line 214, in spacy.syntax._parser_model.ParserModel.begin_update
-                        File "_parser_model.pyx", line 262, in spacy.syntax._parser_model.ParserStepModel.__init__
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/neural/_classes/feed_forward.py", line 46, in begin_update
-                            X, inc_layer_grad = layer.begin_update(X, drop=drop)
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 264, in begin_update
-                            X, bp_layer = layer.begin_update(layer.ops.flatten(seqs_in, pad=pad), drop=drop)
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/neural/_classes/feed_forward.py", line 46, in begin_update
-                            X, inc_layer_grad = layer.begin_update(X, drop=drop)
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 348, in uniqued_fwd
-                            Y_uniq, bp_Y_uniq = layer.begin_update(X_uniq, drop=drop)
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/neural/_classes/feed_forward.py", line 46, in begin_update
-                            X, inc_layer_grad = layer.begin_update(X, drop=drop)
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 132, in begin_update
-                            values = [fwd(X, *a, **k) for fwd in forward]
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 132, in <listcomp>
-                            values = [fwd(X, *a, **k) for fwd in forward]
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 225, in wrap
-                            output = func(*args, **kwargs)
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 132, in begin_update
-                            values = [fwd(X, *a, **k) for fwd in forward]
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 132, in <listcomp>
-                            values = [fwd(X, *a, **k) for fwd in forward]
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 225, in wrap
-                            output = func(*args, **kwargs)
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 132, in begin_update
-                            values = [fwd(X, *a, **k) for fwd in forward]
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 132, in <listcomp>
-                            values = [fwd(X, *a, **k) for fwd in forward]
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 225, in wrap
-                            output = func(*args, **kwargs)
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 132, in begin_update
-                            values = [fwd(X, *a, **k) for fwd in forward]
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 132, in <listcomp>
-                            values = [fwd(X, *a, **k) for fwd in forward]
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/api.py", line 225, in wrap
-                            output = func(*args, **kwargs)
-                        File "/anaconda3/lib/python3.7/site-packages/thinc/neural/_classes/static_vectors.py", line 73, in begin_update
-                            dotted = self.ops.gemm(vectors, self.W, trans2=True)
-                        File "ops.pyx", line 404, in thinc.neural.ops.NumpyOps.gemm
-                        ValueError: Buffer and memoryview are not contiguous in the same dimension.
-            ---
             for topic, model in self.models.items():
 
                 # Get the inference result from the NER model for a question.
@@ -144,7 +82,6 @@ class TargetClassifier(object):
                 if doc.ents:
                     topicName = topic
                     matchedEntities.append(doc.ents)
-            """
 
             # TODO: List out all the topics with a percentage of the match confidence.
             # Currently we would like to return classification result
