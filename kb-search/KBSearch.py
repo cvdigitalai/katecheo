@@ -4,6 +4,7 @@ import json
 import numpy as np
 import os
 import urllib.request
+import numpy as np
 
 
 class KBSearch(object):
@@ -135,3 +136,4 @@ class KBSearch(object):
 
     def tags(self):
         return self.result
+
