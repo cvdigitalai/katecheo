@@ -26,7 +26,7 @@ You will need the following for each topic you want to enable in Katecheo:
 - A pre-trained spaCy NER model all bundled into a single zip file
 - A JSON file containing Knowledge base articles (structure as shown [here](https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_health.json))
 
-### Deploy Katecheo
+### Deploy
 
 1. Clone this repo.
 
@@ -105,6 +105,21 @@ In the future we intend to:
 - Extend our knowledge base search methodology (e.g., to use bigrams and TF-IDF)
 - Enable usage of a wider variety of pre-trained models (BERT, XLNet, etc.)
 - Explore other topic matching/modeling techniques to remove our NER model dependency (non-negative matrix factorization and/or latent dirichlet allocation)
+
+## Citing
+
+If you use Katecheo in your research, please cite _Katecheo: A Portable and Modular System for Multi-Topic Question
+Answering_:
+
+```
+@inproceedings{CV2019Katecheo,
+  title={Katecheo: A Portable and Modular System for Multi-Topic Question
+Answering},
+  author={Shirish Hirekodi and Seban Sunny and Leonard Topno and Alwin Daniel and Reuben Skewes and Stuart Cranney and Daniel Whitenack},
+  year={2019},
+  Eprint = {coming soon...},
+}
+```
 
 ___
 All material is licensed under the [Apache License Version 2.0, January 2004](http://www.apache.org/licenses/LICENSE-2.0).
