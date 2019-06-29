@@ -1,41 +1,22 @@
 # comprehension
 
-## To build
-
-From this comprehension directory:
+## Build
 
 ```
-$ s2i build . seldonio/seldon-core-s2i-python3:0.7 dwhitena/reading_comp:0.1
-
-$ docker push dwhitena/reading_comp:0.1
+$ s2i build . seldonio/seldon-core-s2i-python3:0.7 cvdigital/reading_comp:0.1
+$ docker push cvdigital/reading_comp:0.1
 ```
 
-## API
-
-Example request:
+## Test
 
 ```
-$ curl -X POST -H 'Content-Type: application/json' \
-    -d '{"data": {"names": ["kb", "q"], "ndarray": ["The Matrix is a 1999 science fiction action film written and directed by The Wachowskis, starring Keanu Reeves, Laurence Fishburne, Carrie-Anne Moss, Hugo Weaving, and Joe Pantoliano.", "Who stars in The Matrix?"]}}' \
-    http://35.201.10.193/seldon/default/reading-comprehension/api/v0.1/predictions
+$ docker run --rm cvdigital/reading_comp:0.1
+$ docker exec -it <CONTAINER_ID> python ReadingComp_Test.py
 ```
 
-Example response:
+## Usage
 
 ```
-{
-  "meta": {
-    "puid": "qihufcdu7dejkgrvu300ml7iv8",
-    "tags": {
-    },
-    "routing": {
-    },
-    "requestPath": {
-      "classifier": "dwhitena/reading_comp:0.1"
-    },
-    "metrics": []
-  },
-  "strData": "Keanu Reeves, Laurence Fishburne, Carrie-Anne Moss, Hugo Weaving, and Joe Pantoliano"
-}
+$ docker run --env --rm -p 5001:5000 cvdigital/reading_comp:0.1
+$ curl -g http://localhost:5001/predict --data-urlencode 'json={"data": {"names": ["message"], "ndarray": ["Does some food increase pollen allergy symptoms?"]}, "meta": {"tags":{"proceed":true}}}'
 ```
-
