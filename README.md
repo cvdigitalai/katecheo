@@ -4,7 +4,7 @@ Katecheo is a modular system for topical question answering built on Kubernetes.
 
 You can learn more about Katecheo in:
 
-- This this screencast
+- This [this screencast](https://youtu.be/g51t6eRX2Y8)
 - Our EMNLP 2019 system submission (coming soon)
 
 ## Deploy Katecheo
