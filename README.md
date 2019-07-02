@@ -5,7 +5,7 @@ Katecheo is a modular system for topical question answering built on Kubernetes.
 You can learn more about Katecheo in:
 
 - This [this screencast](https://youtu.be/g51t6eRX2Y8)
-- Our system submission paper (coming soon)
+- Our [system demonstration paper](https://arxiv.org/abs/1907.00854)
 
 ## Deploy Katecheo
 
@@ -108,8 +108,8 @@ In the future we intend to:
 
 ## Citing
 
-If you use Katecheo in your research, please cite _Katecheo: A Portable and Modular System for Multi-Topic Question
-Answering_:
+If you use Katecheo in your research, please cite [Katecheo: A Portable and Modular System for Multi-Topic Question
+Answering](https://arxiv.org/abs/1907.00854):
 
 ```
 @inproceedings{CV2019Katecheo,
@@ -117,7 +117,7 @@ Answering_:
 Answering},
   author={Shirish Hirekodi and Seban Sunny and Leonard Topno and Alwin Daniel and Reuben Skewes and Stuart Cranney and Daniel Whitenack},
   year={2019},
-  Eprint = {coming soon...},
+  Eprint = {arXiv:1907.00854},
 }
 ```
 
