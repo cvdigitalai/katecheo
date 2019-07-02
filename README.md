@@ -113,8 +113,7 @@ Answering](https://arxiv.org/abs/1907.00854):
 
 ```
 @inproceedings{CV2019Katecheo,
-  title={Katecheo: A Portable and Modular System for Multi-Topic Question
-Answering},
+  title={Katecheo: A Portable and Modular System for Multi-Topic Question Answering},
   author={Shirish Hirekodi and Seban Sunny and Leonard Topno and Alwin Daniel and Reuben Skewes and Stuart Cranney and Daniel Whitenack},
   year={2019},
   Eprint = {arXiv:1907.00854},
