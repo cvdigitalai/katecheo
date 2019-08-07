@@ -4,68 +4,80 @@ import os
 import spacy
 
 class TargetClassifier(object):
-  def __init__(self):
+    def __init__(self):
+        modelInfoFromEnv = os.environ['KATECHEO_NER']
+        '''
+        Parse the String in the environment variable.
+        - Each model information is separated by ','
+        - A specific model name and it's NER model location URL is separated by '='
+        '''
+        modelInfos = [sentence.split('=') for sentence in modelInfoFromEnv.split(',')]
 
-    modelInfoFromEnv = os.environ['KATECHEO_NER']
-    '''
-    Parse the String in the environment variable.
-      - Each model information is separated by ','
-      - A specific model name and it's NER model location URL is separated by '='
-    '''
-    modelInfos = [sentence.split('=') for sentence in modelInfoFromEnv.split(',')]
+        nlpModels = {}
 
-    nlpModels = {}
-
-    # Iterate through each entry with the model information.
-    for modelInfo in modelInfos:
-      modelName = modelInfo[0]
-      modelURL = modelInfo[1]
+        # Iterate through each entry with the model information.
+        for modelInfo in modelInfos:
+            modelName = modelInfo[0]
+            modelURL = modelInfo[1]
       
-      # TODO - pull model from GCS with authenticated client
-      # Download the model
-      modelRootDirectory = "./" + modelName
+        # Download the model
+        modelRootDirectory = "./" + modelName
 
-      # Check if the model files already exists.
-      if(modelName not in os.listdir(".")):
-        urllib.request.urlretrieve(modelURL, modelName + ".zip")
-        zipRef = zipfile.ZipFile(modelName + ".zip", 'r')
-        zipRef.extractall(modelRootDirectory)
-        zipRef.close()
+        # Check if the model files already exists.
+        if(modelName not in os.listdir(".")):
+            urllib.request.urlretrieve(modelURL, modelName + ".zip")
+            zipRef = zipfile.ZipFile(modelName + ".zip", 'r')
+            zipRef.extractall(modelRootDirectory)
+            zipRef.close()
       
-      # Get the internal directory of the NER model.
-      modelMainDirectory = os.listdir('./' + modelName)[0]
-      
-      # Check if the model directory has been downloaded.
-      if(modelMainDirectory):
+        # Get the internal directory of the NER model.
+        modelMainDirectory = os.listdir('./' + modelName)[0]
+        
+        # Check if the model directory has been downloaded.
+        if(modelMainDirectory):
 
-        # Load the spaCy models.
-        nlpModels[modelName] = spacy.load(os.path.join(modelRootDirectory, modelMainDirectory))
+            # Load the spaCy models.
+            nlpModels[modelName] = spacy.load(os.path.join(modelRootDirectory, modelMainDirectory))
 
-    self.models = nlpModels
-    
-  def predict(self,X,feature_names):
+        self.models = nlpModels
+        
+    def predict(self, X, feature_names, meta):
+        
+        # logic from parent
+        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags']['proceed']:
+        
+            topicName = ""
+            matchedEntities = []
 
-    topicName = ""
-    matchedEntities = []
-    
-    # Get the text string that is to be classified.
-    messageText = str(X[0])
+            # Get the text string that is to be classified.
+            messageText = str(X[0])
 
-    # Iterate through all the models
-    for topic, model in self.models.items():
+            # Iterate through all the models
+            for topic, model in self.models.items():
 
-      # Get the inference result from the NER model for a question.
-      doc = model(messageText)
+                # Get the inference result from the NER model for a question.
+                doc = model(messageText)
 
-      # Check if the model has recognised the trained entities in the question.
-      if doc.ents:
-        topicName = topic
-        matchedEntities.append(doc.ents)
+                # Check if the model has recognised the trained entities in the question.
+                if doc.ents:
+                    topicName = topic
+                    matchedEntities.append(doc.ents)
 
-    # TODO: List out all the topics with a percentage of the match confidence.
-    # Currently we would like to return classification result
-    # only if it matches a single topic.
-    if len(matchedEntities) == 1:
-      return str({"topic": topicName, "message": messageText})
+            # TODO: List out all the topics with a percentage of the match confidence.
+            # Currently we would like to return classification result
+            # only if it matches a single topic.
+            if len(matchedEntities) == 1:
+                self.result = {'proceed':True}
+                self.result['topic'] = topicName
+                return X
+            else:
+                self.result = {'proceed':False}
+                self.result['point_of_failure'] = 'No Matching Topic'
+                return X
 
-    return str({"topic": '', "message": messageText})
+        else:
+            self.result = meta['tags']
+            return X
+
+    def tags(self):
+        return self.result
