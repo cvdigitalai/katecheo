@@ -1,0 +1,17 @@
+[
+	{
+		"name": "topic 1",
+		"ner_model": "https://www.google.com/",
+		"kb_file": "https://www.google.com/"
+	},
+	{
+		"name": "topic 2",
+		"ner_model": "https://www.google.com/",
+		"kb_file": "https://www.google.com/"
+	},
+	{
+		"name": "topic N",
+		"ner_model": "https://www.google.com/",
+		"kb_file": "https://www.google.com/"
+	}
+]
