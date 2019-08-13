@@ -1,5 +1,6 @@
 from allennlp import pretrained
 
+
 class ReadingComp(object):
     """
         ReadingComp takes as input the original input question plus the matched knowledge base article body text and
@@ -27,14 +28,16 @@ class ReadingComp(object):
         """
 
         # logic from parent
-        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags']['proceed']:
+        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags'][
+                'proceed']:
             if len(X) != 2:
                 self.result = meta['tags']
                 self.result['proceed'] = False
                 self.result['point_of_failure'] = 'No Article Text'
                 return ''
             prediction = self.model.predict(passage=str(X[0]),
-                                            question=str(X[1]))['best_span_str']
+                                            question=str(
+                                                X[1]))['best_span_str']
             self.result = meta['tags']
             return prediction
         else:

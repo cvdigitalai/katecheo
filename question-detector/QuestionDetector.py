@@ -1,19 +1,16 @@
 class QuestionDetector(object):
-
     """
         QuestionDetector determines if the input text is actually a question
     """
     result = {}
 
     def __init__(self):
-
         """
             During initialization, QuestionID is set as the model
         """
         self.model = QuestionID()
 
     def predict(self, X, features_names):
-
         """
             Returns a prediction
 
@@ -34,8 +31,8 @@ class QuestionDetector(object):
     def tags(self):
         return self.result
 
+
 class QuestionID:
-    
     """
         QuestionID has the actual logic used to determine if sentence is a question
     """

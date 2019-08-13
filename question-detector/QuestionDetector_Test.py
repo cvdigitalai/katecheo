@@ -5,6 +5,7 @@ import unittest
 import json
 import QuestionDetector
 
+
 class QuestionDetector_Test(unittest.TestCase):
     def setUp(self):
         self.question = QuestionDetector.QuestionDetector()
@@ -14,6 +15,7 @@ class QuestionDetector_Test(unittest.TestCase):
 
         response = self.question.predict(params, "features")
         self.assertIsNotNone(response)
+
 
 if __name__ == '__main__':
     unittest.main()

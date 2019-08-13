@@ -75,7 +75,8 @@ class KBSearch(object):
                 for element in parsed:
                     self.records[kb['topic']][element['title']] = element
 
-                self.titles[kb['topic']] = list(self.records[kb['topic']].keys())
+                self.titles[kb['topic']] = list(
+                    self.records[kb['topic']].keys())
 
     def downloadFile(self, url):
         """
@@ -103,17 +104,21 @@ class KBSearch(object):
         response = {}
 
         # Logic from parent
-        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags']['proceed']:
+        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags'][
+                'proceed']:
             try:
                 # Try matching each record's title field with search phrase
                 didNotMatchAvailableTopics = True
                 for kb in self.availableKB:
                     if meta['tags']['topic'] == kb['topic']:
                         didNotMatchAvailableTopics = False
-                        ret = process.extractOne(X[self.SEARCH_PHRASE],
-                                                self.titles[meta['tags']['topic']],
-                                                scorer=fuzz.ratio)
-                        X = np.append([self.records[meta['tags']['topic']][ret[0]]['body']], X)
+                        ret = process.extractOne(
+                            X[self.SEARCH_PHRASE],
+                            self.titles[meta['tags']['topic']],
+                            scorer=fuzz.ratio)
+                        X = np.append([
+                            self.records[meta['tags']['topic']][ret[0]]['body']
+                        ], X)
                         self.result = meta['tags']
                         return X
 
@@ -121,7 +126,8 @@ class KBSearch(object):
                 if didNotMatchAvailableTopics:
                     self.result = meta['tags']
                     self.result['proceed'] = False
-                    self.result['point_of_failure'] = 'KB for topic \"' + meta['tags']['topic'] + '\" not found'
+                    self.result['point_of_failure'] = 'KB for topic \"' + meta[
+                        'tags']['topic'] + '\" not found'
                     return X
 
             except KeyError:
@@ -136,4 +142,3 @@ class KBSearch(object):
 
     def tags(self):
         return self.result
-
