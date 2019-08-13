@@ -84,7 +84,6 @@ class TargetClassifier(object):
             # TODO: List out all the topics with a percentage of the match confidence.
             # Currently we would like to return classification result
             # only if it matches a single topic.
-            print(matchedEntities)
             if len(matchedEntities) == 1:
                 self.result = {'proceed': True}
                 self.result['topic'] = topicName
