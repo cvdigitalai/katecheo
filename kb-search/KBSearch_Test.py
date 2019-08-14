@@ -17,13 +17,21 @@ class KBSearch_Test(unittest.TestCase):
     def test_topic_health(self):
         params = ['Does some food increase pollen allergy symptoms?', 'health']
 
-        response = self.search.predict(params, "features", {'tags': {'proceed': True, "topic": "faith"}})
+        response = self.search.predict(
+            params, "features", {'tags': {
+                'proceed': True,
+                "topic": "faith"
+            }})
         self.assertIsNotNone(response)
 
     def test_topic_faith(self):
         params = ['Life Belt or Lifeboat', 'faith']
 
-        response = self.search.predict(params, "features", {'tags': {'proceed': True, "topic": "faith"}})
+        response = self.search.predict(
+            params, "features", {'tags': {
+                'proceed': True,
+                "topic": "faith"
+            }})
         self.assertIsNotNone(response)
 
 

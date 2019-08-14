@@ -1,23 +1,23 @@
 class QuestionDetector(object):
     """
-    QuestionDetector determines if the input text is actually a question
+        QuestionDetector determines if the input text is actually a question
     """
     result = {}
 
     def __init__(self):
         """
-        During initialization, QuestionID is set as the model
+            During initialization, QuestionID is set as the model
         """
         self.model = QuestionID()
 
     def predict(self, X, features_names):
         """
-        Returns a prediction
+            Returns a prediction
 
-        Parameters
-        ----------
-        X : array-like
-        feature_names : array of feature names (optional)
+            Parameters
+            ----------
+            X : array-like
+            feature_names : array of feature names (optional)
         """
         question = self.model.predict(X[0])
         if question:
@@ -31,9 +31,10 @@ class QuestionDetector(object):
     def tags(self):
         return self.result
 
+
 class QuestionID:
     """
-    QuestionID has actual logic used to determine if sentence is a question
+        QuestionID has the actual logic used to determine if sentence is a question
     """
     def padCharacter(self, character: str, sentence: str):
         if character in sentence:
