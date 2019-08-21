@@ -4,9 +4,10 @@
 import unittest
 import json
 import os
+import TargetClassifier
+
 os.environ[
     'KATECHEO_NER'] = 'health=https://storage.googleapis.com/pachyderm-neuralbot/ner_models/health.zip,faith=https://storage.googleapis.com/pachyderm-neuralbot/ner_models/faith.zip'
-import TargetClassifier
 
 
 class TargetClassifier_Test(unittest.TestCase):
@@ -14,10 +15,13 @@ class TargetClassifier_Test(unittest.TestCase):
         self.classifier = TargetClassifier.TargetClassifier()
 
     def test_get_topic(self):
-        params = ['Does some food increase pollen allergy symptoms?']
-
-        response = self.classifier.predict(params, "features", {'tags': {'proceed': True}})
+        params = ["Does some food increase pollen allergy symptoms?"]
+        response = self.classifier.predict(params, "features",
+                                           {'tags': {
+                                               'proceed': True
+                                           }})
         self.assertIsNotNone(response)
+
 
 if __name__ == '__main__':
     unittest.main()

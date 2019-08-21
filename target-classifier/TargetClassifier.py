@@ -5,27 +5,22 @@ import spacy
 
 
 class TargetClassifier(object):
-    """
-    TargetClassifier attempts to classify the input question into one of the topics
-    """
-    models = {}
-
     def __init__(self):
         """
-        During initialization, spaCy models are loaded and kept ready for classifying a sentence to a topic
+            During initialization, spaCy models are loaded and kept ready for classifying a sentence to a topic
         """
 
         modelInfoFromEnv = os.environ['KATECHEO_NER']
         '''
-        Parse the String in the environment variable.
-        - Each model information is separated by ','
-        - A specific model name and it's NER model location URL is separated by '='
+            Parse the String in the environment variable.
+            - Each model information is separated by ','
+            - A specific model name and it's NER model location URL is separated by '='
         '''
         modelInfos = [
             sentence.split('=') for sentence in modelInfoFromEnv.split(',')
         ]
 
-        self.models = {}
+        nlpModels = {}
 
         # Iterate through each entry with the model information.
         for modelInfo in modelInfos:
@@ -36,7 +31,7 @@ class TargetClassifier(object):
             modelRootDirectory = "./" + modelName
 
             # Check if the model files already exists.
-            if modelName not in os.listdir("."):
+            if (modelName not in os.listdir(".")):
                 urllib.request.urlretrieve(modelURL, modelName + ".zip")
                 zipRef = zipfile.ZipFile(modelName + ".zip", 'r')
                 zipRef.extractall(modelRootDirectory)
@@ -46,25 +41,28 @@ class TargetClassifier(object):
             modelMainDirectory = os.listdir('./' + modelName)[0]
 
             # Check if the model directory has been downloaded.
-            if modelMainDirectory:
+            if (modelMainDirectory):
 
                 # Load the spaCy models.
-                self.models[modelName] = spacy.load(
+                nlpModels[modelName] = spacy.load(
                     os.path.join(modelRootDirectory, modelMainDirectory))
 
+        self.models = nlpModels
 
-    def predict(self, X, feature_names, meta):
-        """
-        Returns the search string and topic to which it was classified
+    """
+        Returns a string with data passed on from the previous models.
 
         Parameters
         ----------
-        X : array-like
-        feature_names : array of feature names (optional)
-        """
+        X : list of input texts
+        feature_names : list of feature names
+        meta : object with additional tags
+    """
+    def predict(self, X, feature_names, meta):
 
         # logic from parent
-        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags']['proceed']:
+        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags'][
+                'proceed']:
 
             topicName = ""
             matchedEntities = []
