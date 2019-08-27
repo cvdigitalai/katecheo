@@ -4,7 +4,6 @@ from nltk.corpus import stopwords
 import json
 import numpy as np
 import os
-from heapq import nlargest
 import urllib.request
 
 class KBSearch(object):
