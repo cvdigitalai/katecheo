@@ -1,11 +1,11 @@
-from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
+from nltk.corpus import stopwords
 import json
 import numpy as np
 import os
+from heapq import nlargest
 import urllib.request
-import numpy as np
-
 
 class KBSearch(object):
     """
@@ -13,12 +13,11 @@ class KBSearch(object):
 
     The knowledge base articles list is in JSON list format and stored in the cloud
     """
-    SEARCH_PHRASE = 0
-    TOPIC = 1
-
+    vectorizer = {}
+    allDocs = {}
+    allVector = {}
+    corpus = {}
     availableKB = []
-    records = {}
-    titles = {}
     result = {}
 
     def __init__(self):
@@ -61,22 +60,20 @@ class KBSearch(object):
             self.availableKB.append({'topic': parts[0], 'url': parts[1]})
             self.downloadFile(parts[1])
 
-        # For each topic
-        #   - create a list of titles
-        #   - create a list of titles and article bodies
-        self.records = {}
-        self.titles = {}
+        print("kb_list", kb_list)
+        print("self.availableKB", self.availableKB)
+
         for kb in self.availableKB:
             with open(os.path.basename(kb['url'])) as json_file:
-                parsed = json.load(json_file)
+                self.corpus[kb['topic']] = json.load(json_file)
 
-                self.records[kb['topic']] = {}
+                self.allDocs[kb['topic']] = []
 
-                for element in parsed:
-                    self.records[kb['topic']][element['title']] = element
+                for doc in self.corpus[kb['topic']]:
+                    self.allDocs[kb['topic']].append(str(doc['title']) + " " + str(doc['body']))
 
-                self.titles[kb['topic']] = list(
-                    self.records[kb['topic']].keys())
+                self.vectorizer[kb['topic']] = TfidfVectorizer(ngram_range=(1, 2)) #
+                self.allVector[kb['topic']] = self.vectorizer[kb['topic']].fit_transform(self.allDocs[kb['topic']])
 
     def downloadFile(self, url):
         """
@@ -101,40 +98,53 @@ class KBSearch(object):
         response:
             The element in knowledge base list which matched the search phrase
         """
-        response = {}
-
         # Logic from parent
-        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags'][
-                'proceed']:
-            try:
-                # Try matching each record's title field with search phrase
-                didNotMatchAvailableTopics = True
-                for kb in self.availableKB:
-                    if meta['tags']['topic'] == kb['topic']:
-                        didNotMatchAvailableTopics = False
-                        ret = process.extractOne(
-                            X[self.SEARCH_PHRASE],
-                            self.titles[meta['tags']['topic']],
-                            scorer=fuzz.ratio)
+        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags']['proceed']:
+            didNotMatchAvailableTopics = True
+            for kb in self.availableKB:
+                if meta['tags']['topic'] == kb['topic']:
+                    didNotMatchAvailableTopics = False
+
+                    question = X[0]
+                    print("question", question)
+
+                    questionVector = self.vectorizer[kb['topic']].fit(self.allDocs[kb['topic']])
+                    questionVector = questionVector.transform([question])
+
+                    # Cosine Similarity
+                    cosineSimilarity = cosine_similarity(self.allVector[kb['topic']], questionVector).flatten()
+
+                    foundFlag = False
+                    maxIndex = 0
+                    maxCos = 0
+                    
+                    for index, doc in enumerate(self.corpus[kb['topic']], 0):
+                        doc['cos_value'] = cosineSimilarity[index]
+
+                    for index, doc in enumerate(self.corpus[kb['topic']], 0):
+                        if cosineSimilarity[index] > maxCos:
+                            foundFlag = True
+                            maxCos = cosineSimilarity[index]
+                            maxIndex = index
+
+                    if foundFlag:
+                        """
+                        print([(question + "\nMatched\n" + str(maxCos) + "\n\n>>" + str(self.corpus[kb['topic']][maxIndex]))])
+                        print("question: ", question)
+                        print("cos: ", str(maxCos))
+                        print("found: ", str(self.corpus[kb['topic']][maxIndex]['body']))
+                        """
                         X = np.append([
-                            self.records[meta['tags']['topic']][ret[0]]['body']
+                            str(self.corpus[kb['topic']][maxIndex]['body'])
                         ], X)
                         self.result = meta['tags']
                         return X
-
-                # Notify caller that something went wrong
-                if didNotMatchAvailableTopics:
-                    self.result = meta['tags']
-                    self.result['proceed'] = False
-                    self.result['point_of_failure'] = 'KB for topic \"' + meta[
-                        'tags']['topic'] + '\" not found'
-                    return X
-
-            except KeyError:
-                self.result = meta['tags']
-                self.result['proceed'] = False
-                self.result['point_of_failure'] = 'KB key error'
-                return X
+                    else:
+                        print([(question + "\tNothing matched"), others])
+                        self.result = meta['tags']
+                        self.result['proceed'] = False
+                        self.result['point_of_failure'] = 'KB for topic \"' + meta['tags']['topic'] + '\" not found'
+                        return X
 
         else:
             self.result = meta['tags']
