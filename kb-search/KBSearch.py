@@ -59,9 +59,6 @@ class KBSearch(object):
             self.availableKB.append({'topic': parts[0], 'url': parts[1]})
             self.downloadFile(parts[1])
 
-        print("kb_list", kb_list)
-        print("self.availableKB", self.availableKB)
-
         for kb in self.availableKB:
             with open(os.path.basename(kb['url'])) as json_file:
                 self.corpus[kb['topic']] = json.load(json_file)
@@ -97,8 +94,9 @@ class KBSearch(object):
         response:
             The element in knowledge base list which matched the search phrase
         """
+
         # Logic from parent
-        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags']['proceed']:
+        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags']['proceed'] and 'topic' in meta['tags']:
             didNotMatchAvailableTopics = True
             for kb in self.availableKB:
                 if meta['tags']['topic'] == kb['topic']:
@@ -127,23 +125,18 @@ class KBSearch(object):
                             maxIndex = index
 
                     if foundFlag:
-                        """
-                        print([(question + "\nMatched\n" + str(maxCos) + "\n\n>>" + str(self.corpus[kb['topic']][maxIndex]))])
-                        print("question: ", question)
-                        print("cos: ", str(maxCos))
-                        print("found: ", str(self.corpus[kb['topic']][maxIndex]['body']))
-                        """
                         X = np.append([
                             str(self.corpus[kb['topic']][maxIndex]['body'])
                         ], X)
                         self.result = meta['tags']
                         return X
-                    else:
-                        print([(question + "\tNothing matched"), others])
-                        self.result = meta['tags']
-                        self.result['proceed'] = False
-                        self.result['point_of_failure'] = 'KB for topic \"' + meta['tags']['topic'] + '\" not found'
-                        return X
+
+            # Notify caller that something went wrong
+            if didNotMatchAvailableTopics:
+                self.result = meta['tags']
+                self.result['proceed'] = False
+                self.result['point_of_failure'] = 'KB for topic \"' + meta['tags']['topic'] + '\" not found'
+                return X
 
         else:
             self.result = meta['tags']
