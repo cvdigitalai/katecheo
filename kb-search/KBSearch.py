@@ -125,10 +125,19 @@ class KBSearch(object):
                             maxIndex = index
 
                     if foundFlag:
+                        article_source = ""
+                        if "article_url" in self.corpus[kb['topic']][maxIndex]:
+                            article_source = str(self.corpus[kb['topic']][maxIndex]['article_url'])
+                        else:
+                            article_source = str(self.corpus[kb['topic']][maxIndex]['body'])
+
                         X = np.append([
                             str(self.corpus[kb['topic']][maxIndex]['body'])
                         ], X)
+
                         self.result = meta['tags']
+                        self.result["article_source"] = article_source 
+
                         return X
 
             # Notify caller that something went wrong
