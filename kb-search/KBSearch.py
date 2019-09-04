@@ -6,6 +6,7 @@ import numpy as np
 import os
 import urllib.request
 
+
 class KBSearch(object):
     """
     KBSearch searches for a phrase in the list of knowledge base articles' title field. It uses FuzzyWuzzy for matching
@@ -66,10 +67,13 @@ class KBSearch(object):
                 self.allDocs[kb['topic']] = []
 
                 for doc in self.corpus[kb['topic']]:
-                    self.allDocs[kb['topic']].append(str(doc['title']) + " " + str(doc['body']))
+                    self.allDocs[kb['topic']].append(
+                        str(doc['title']) + " " + str(doc['body']))
 
-                self.vectorizer[kb['topic']] = TfidfVectorizer(ngram_range=(1, 2)) #
-                self.allVector[kb['topic']] = self.vectorizer[kb['topic']].fit_transform(self.allDocs[kb['topic']])
+                self.vectorizer[kb['topic']] = TfidfVectorizer(
+                    ngram_range=(1, 2))  #
+                self.allVector[kb['topic']] = self.vectorizer[
+                    kb['topic']].fit_transform(self.allDocs[kb['topic']])
 
     def downloadFile(self, url):
         """
@@ -95,26 +99,28 @@ class KBSearch(object):
             The element in knowledge base list which matched the search phrase
         """
 
+        question = ""
+
         # Logic from parent
-        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags']['proceed'] and 'topic' in meta['tags']:
+        if 'tags' in meta and 'topic' in meta['tags']:
             didNotMatchAvailableTopics = True
             for kb in self.availableKB:
                 if meta['tags']['topic'] == kb['topic']:
                     didNotMatchAvailableTopics = False
-
                     question = X[0]
-                    print("question", question)
 
-                    questionVector = self.vectorizer[kb['topic']].fit(self.allDocs[kb['topic']])
+                    questionVector = self.vectorizer[kb['topic']].fit(
+                        self.allDocs[kb['topic']])
                     questionVector = questionVector.transform([question])
 
                     # Cosine Similarity
-                    cosineSimilarity = cosine_similarity(self.allVector[kb['topic']], questionVector).flatten()
+                    cosineSimilarity = cosine_similarity(
+                        self.allVector[kb['topic']], questionVector).flatten()
 
                     foundFlag = False
                     maxIndex = 0
                     maxCos = 0
-                    
+
                     for index, doc in enumerate(self.corpus[kb['topic']], 0):
                         doc['cos_value'] = cosineSimilarity[index]
 
@@ -127,29 +133,36 @@ class KBSearch(object):
                     if foundFlag:
                         article_source = ""
                         if "article_url" in self.corpus[kb['topic']][maxIndex]:
-                            article_source = str(self.corpus[kb['topic']][maxIndex]['article_url'])
+                            article_source = str(self.corpus[kb['topic']]
+                                                 [maxIndex]['article_url'])
                         else:
-                            article_source = str(self.corpus[kb['topic']][maxIndex]['body'])
+                            article_source = str(
+                                self.corpus[kb['topic']][maxIndex]['body'])
 
-                        X = np.append([
-                            str(self.corpus[kb['topic']][maxIndex]['body'])
-                        ], X)
+                        X = np.append(
+                            [str(self.corpus[kb['topic']][maxIndex]['body'])],
+                            X)
 
                         self.result = meta['tags']
-                        self.result["article_source"] = article_source 
-
+                        self.result["kb_article"] = True
+                        self.result["article_source"] = article_source
                         return X
 
             # Notify caller that something went wrong
             if didNotMatchAvailableTopics:
                 self.result = meta['tags']
-                self.result['proceed'] = False
-                self.result['point_of_failure'] = 'KB for topic \"' + meta['tags']['topic'] + '\" not found'
+                self.result['kb_search_error'] = 'KB for topic \"' + meta[
+                    'tags']['topic'] + '\" not found'
                 return X
 
-        else:
             self.result = meta['tags']
+            self.result[
+                'kb_search_error'] = 'Could not match "' + question + '" with any article on the topic of "' + meta[
+                    'tags']['topic'] + '"'
             return X
+
+        self.result = meta['tags']
+        return X
 
     def tags(self):
         return self.result

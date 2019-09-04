@@ -11,12 +11,15 @@ class ReadingComp_Test(unittest.TestCase):
         self.comprehension = ReadingComp.ReadingComp()
 
     def test_comprehension(self):
-        params = ['Does some food increase pollen allergy symptoms?']
+        params = [
+            'Jesus of Nazareth, also known as Jesus Christ, was a Jewish teacher and reformer of religion who has become the main and central figure of Christianity. Christians follow the example of Jesus, accept his words to be true, and worship him as God. He is one of the most famous, most recognized, and most influential persons in the world history',
+            'Who is Jesus?'
+        ]
 
-        response = self.comprehension.predict(params, "features",
-                                              {'tags': {
-                                                  'proceed': True
-                                              }})
+        response = self.comprehension.predict(
+            params, "features", {'tags': {
+                'kb_search_error': "some error"
+            }})
         self.assertIsNotNone(response)
 
 
