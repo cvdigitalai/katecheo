@@ -18,7 +18,7 @@ class TargetClassifier_Test(unittest.TestCase):
         params = ["Does some food increase pollen allergy symptoms?"]
         response = self.classifier.predict(params, "features",
                                            {'tags': {
-                                               'proceed': True
+                                               'question': True
                                            }})
         self.assertIsNotNone(response)
 

@@ -61,8 +61,8 @@ class TargetClassifier(object):
     def predict(self, X, feature_names, meta):
 
         # logic from parent
-        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags'][
-                'proceed']:
+        if 'tags' in meta and 'question' in meta['tags'] and meta['tags'][
+                'question']:
 
             topicName = ""
             matchedEntities = []
@@ -85,12 +85,10 @@ class TargetClassifier(object):
             # Currently we would like to return classification result
             # only if it matches a single topic.
             if len(matchedEntities) == 1:
-                self.result = {'proceed': True}
                 self.result['topic'] = topicName
                 return X
             else:
-                self.result = {'proceed': False}
-                self.result['point_of_failure'] = 'No Matching Topic'
+                self.result['topic_classifier_error'] = 'No Matching Topic'
                 return X
 
         else:
