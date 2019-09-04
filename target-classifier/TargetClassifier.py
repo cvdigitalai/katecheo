@@ -5,6 +5,9 @@ import spacy
 
 
 class TargetClassifier(object):
+
+    result = {}
+    
     def __init__(self):
         """
             During initialization, spaCy models are loaded and kept ready for classifying a sentence to a topic
