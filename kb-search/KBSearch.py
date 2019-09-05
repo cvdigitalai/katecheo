@@ -102,7 +102,7 @@ class KBSearch(object):
         question = ""
 
         # Logic from parent
-        if 'tags' in meta and 'topic' in meta['tags']:
+        if 'tags' in meta and 'topic' in meta['tags'] and len(meta['tags']['topic']) > 0:
             didNotMatchAvailableTopics = True
             for kb in self.availableKB:
                 if meta['tags']['topic'] == kb['topic']:
@@ -144,18 +144,25 @@ class KBSearch(object):
                             X)
 
                         self.result = meta['tags']
+
                         self.result["kb_article"] = True
                         self.result["article_source"] = article_source
+                        self.result['kb_search_error'] = ""
                         return X
 
             # Notify caller that something went wrong
             if didNotMatchAvailableTopics:
                 self.result = meta['tags']
+
+                self.result["kb_article"] = False
+                self.result["article_source"] = ""
                 self.result['kb_search_error'] = 'KB for topic \"' + meta[
                     'tags']['topic'] + '\" not found'
                 return X
 
             self.result = meta['tags']
+            self.result["kb_article"] = False
+            self.result["article_source"] = ""
             self.result[
                 'kb_search_error'] = 'Could not match "' + question + '" with any article on the topic of "' + meta[
                     'tags']['topic'] + '"'
