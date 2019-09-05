@@ -89,8 +89,10 @@ class TargetClassifier(object):
             # only if it matches a single topic.
             if len(matchedEntities) == 1:
                 self.result['topic'] = topicName
+                self.result['topic_classifier_error'] = ''
                 return X
             else:
+                self.result['topic'] = ''
                 self.result['topic_classifier_error'] = 'No Matching Topic'
                 return X
 

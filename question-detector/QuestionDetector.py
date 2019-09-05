@@ -22,6 +22,7 @@ class QuestionDetector(object):
         question = self.model.predict(X[0])
         if question:
             self.result['question'] = True
+            self.result['question_detector_error'] = ''
         else:
             self.result['question'] = False
             self.result['question_detector_error'] = 'Not Question'
