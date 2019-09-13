@@ -6,6 +6,7 @@ class ReadingComp(object):
         ReadingComp takes as input the original input question plus the matched knowledge base article body text and
         uses a reading comprehension model to select an appropriate answer from within the kb article
     """
+
     def __init__(self):
         """
             During initialization, Allen's BiDAF model is setup
@@ -28,21 +29,21 @@ class ReadingComp(object):
         """
 
         # logic from parent
-        if 'tags' in meta and 'proceed' in meta['tags'] and meta['tags'][
-                'proceed']:
+        if 'tags' in meta and 'kb_article' in meta['tags'] and meta['tags']['kb_article'] == True:
             if len(X) != 2:
                 self.result = meta['tags']
-                self.result['proceed'] = False
-                self.result['point_of_failure'] = 'No Article Text'
+                self.result['comprehension_error'] = 'No Article Text'
                 return ''
+
             prediction = self.model.predict(passage=str(X[0]),
                                             question=str(
                                                 X[1]))['best_span_str']
             self.result = meta['tags']
+            self.result['comprehension_error'] = ''
             return prediction
-        else:
-            self.result = meta['tags']
-            return ''
+
+        self.result = meta['tags']
+        return X
 
     def tags(self):
         return self.result
