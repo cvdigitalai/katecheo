@@ -21,5 +21,5 @@ $ docker exec -it kb-search python KBSearch_Test.py
 ```
 $ docker run --env KATECHEO_KB='health=https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_health.json,faith=https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_faith.json' --name "kb-search" --rm -p 5001:5000 cvdigital/kb_search:<TAG>
 
-$ curl -g http://localhost:5001/predict --data-urlencode 'json={"data": {"names": ["message"], "ndarray": ["Does some food increase pollen allergy symptoms?"]}, "meta": {"tags":{"topic": "faith", "topic_classifier_error": ""}}}'
+$ curl -g http://localhost:5001/predict --data-urlencode 'json={"data": {"names": ["message"], "ndarray": ["What does the Bible say about money?"]}, "meta": {"tags":{"topic": "faith", "topic_classifier_error": ""}}}'
 ```
