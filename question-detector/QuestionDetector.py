@@ -51,7 +51,7 @@ class QuestionID:
     def predict(self, sentence: str):
         questionStarters = [
             "which", "wont", "cant", "isnt", "arent", "is", "do", "does",
-            "will", "can", "is"
+            "will", "can"
         ]
         questionElements = [
             "who", "what", "when", "where", "why", "how", "sup", "?"
