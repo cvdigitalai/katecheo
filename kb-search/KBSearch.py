@@ -1,10 +1,10 @@
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import TfidfVectorizer
-from nltk.corpus import stopwords
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 import json
 import numpy as np
 import os
 import urllib.request
+import numpy as np
 
 
 class KBSearch(object):
@@ -13,11 +13,12 @@ class KBSearch(object):
 
     The knowledge base articles list is in JSON list format and stored in the cloud
     """
-    vectorizer = {}
-    allDocs = {}
-    allVector = {}
-    corpus = {}
+    SEARCH_PHRASE = 0
+    TOPIC = 1
+
     availableKB = []
+    records = {}
+    titles = {}
     result = {}
 
     def __init__(self):
@@ -60,20 +61,22 @@ class KBSearch(object):
             self.availableKB.append({'topic': parts[0], 'url': parts[1]})
             self.downloadFile(parts[1])
 
+        # For each topic
+        #   - create a list of titles
+        #   - create a list of titles and article bodies
+        self.records = {}
+        self.titles = {}
         for kb in self.availableKB:
             with open(os.path.basename(kb['url'])) as json_file:
-                self.corpus[kb['topic']] = json.load(json_file)
+                parsed = json.load(json_file)
 
-                self.allDocs[kb['topic']] = []
+                self.records[kb['topic']] = {}
 
-                for doc in self.corpus[kb['topic']]:
-                    self.allDocs[kb['topic']].append(
-                        str(doc['title']) + " " + str(doc['body']))
+                for element in parsed:
+                    self.records[kb['topic']][element['title']] = element
 
-                self.vectorizer[kb['topic']] = TfidfVectorizer(
-                    ngram_range=(1, 2))  #
-                self.allVector[kb['topic']] = self.vectorizer[
-                    kb['topic']].fit_transform(self.allDocs[kb['topic']])
+                self.titles[kb['topic']] = list(
+                    self.records[kb['topic']].keys())
 
     def downloadFile(self, url):
         """
@@ -98,71 +101,50 @@ class KBSearch(object):
         response:
             The element in knowledge base list which matched the search phrase
         """
-
-        question = ""
+        response = {}
 
         # Logic from parent
-        if 'tags' in meta and 'topic' in meta['tags']:
-            didNotMatchAvailableTopics = True
-            for kb in self.availableKB:
-                if meta['tags']['topic'] == kb['topic']:
-                    didNotMatchAvailableTopics = False
-                    question = X[0]
-
-                    questionVector = self.vectorizer[kb['topic']].fit(
-                        self.allDocs[kb['topic']])
-                    questionVector = questionVector.transform([question])
-
-                    # Cosine Similarity
-                    cosineSimilarity = cosine_similarity(
-                        self.allVector[kb['topic']], questionVector).flatten()
-
-                    foundFlag = False
-                    maxIndex = 0
-                    maxCos = 0
-
-                    for index, doc in enumerate(self.corpus[kb['topic']], 0):
-                        doc['cos_value'] = cosineSimilarity[index]
-
-                    for index, doc in enumerate(self.corpus[kb['topic']], 0):
-                        if cosineSimilarity[index] > maxCos:
-                            foundFlag = True
-                            maxCos = cosineSimilarity[index]
-                            maxIndex = index
-
-                    if foundFlag:
-                        article_source = ""
-                        if "article_url" in self.corpus[kb['topic']][maxIndex]:
-                            article_source = str(self.corpus[kb['topic']]
-                                                 [maxIndex]['article_url'])
-                        else:
-                            article_source = str(
-                                self.corpus[kb['topic']][maxIndex]['body'])
-
-                        X = np.append(
-                            [str(self.corpus[kb['topic']][maxIndex]['body'])],
-                            X)
-
+        if 'tags' in meta and 'topic' in meta['tags'] and len(meta['tags']['topic']) > 0:
+            try:
+                # Try matching each record's title field with search phrase
+                didNotMatchAvailableTopics = True
+                for kb in self.availableKB:
+                    if meta['tags']['topic'] == kb['topic']:
+                        didNotMatchAvailableTopics = False
+                        ret = process.extractOne(
+                            X[self.SEARCH_PHRASE],
+                            self.titles[meta['tags']['topic']],
+                            scorer=fuzz.ratio)
+                        X = np.append([
+                            self.records[meta['tags']['topic']][ret[0]]['body']
+                        ], X)
                         self.result = meta['tags']
                         self.result["kb_article"] = True
-                        self.result["article_source"] = article_source
+                        self.result["article_source"] = ""
+                        self.result['kb_search_error'] = ""
                         return X
 
-            # Notify caller that something went wrong
-            if didNotMatchAvailableTopics:
+                # Notify caller that something went wrong
+                if didNotMatchAvailableTopics:
+                    self.result = meta['tags']
+                    self.result["kb_article"] = False
+                    self.result["article_source"] = ""
+                    self.result['kb_search_error'] = 'KB for topic \"' + meta[
+                        'tags']['topic'] + '\" not found'
+                    return X
+
+            except KeyError:
                 self.result = meta['tags']
-                self.result['kb_search_error'] = 'KB for topic \"' + meta[
-                    'tags']['topic'] + '\" not found'
+                self.result["kb_article"] = False
+                self.result["article_source"] = ""
+                self.result[
+                    'kb_search_error'] = 'Could not match "' + question + '" with any article on the topic of "' + meta[
+                        'tags']['topic'] + '"'
                 return X
 
+        else:
             self.result = meta['tags']
-            self.result[
-                'kb_search_error'] = 'Could not match "' + question + '" with any article on the topic of "' + meta[
-                    'tags']['topic'] + '"'
             return X
-
-        self.result = meta['tags']
-        return X
 
     def tags(self):
         return self.result

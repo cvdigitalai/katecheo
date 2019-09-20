@@ -29,7 +29,7 @@ class ReadingComp(object):
         """
 
         # logic from parent
-        if 'tags' in meta and 'kb_article' in meta['tags']:
+        if 'tags' in meta and 'kb_article' in meta['tags'] and meta['tags']['kb_article'] == True:
             if len(X) != 2:
                 self.result = meta['tags']
                 self.result['comprehension_error'] = 'No Article Text'
@@ -39,6 +39,7 @@ class ReadingComp(object):
                                             question=str(
                                                 X[1]))['best_span_str']
             self.result = meta['tags']
+            self.result['comprehension_error'] = ''
             return prediction
 
         self.result = meta['tags']
