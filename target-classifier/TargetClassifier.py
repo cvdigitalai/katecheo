@@ -71,7 +71,7 @@ class TargetClassifier(object):
             matchedEntities = []
 
             # Get the text string that is to be classified.
-            messageText = str(X[0])
+            messageText = str(X[0]).lower()
 
             # Iterate through all the models
             for topic, model in self.models.items():
