@@ -18,8 +18,8 @@ class ReadingComp(object):
 
         self.bidaf = False
 
-        if environ.get('KATECHEO_COMP') is not None:
-            if environ.get('KATECHEO_COMP').lower() == 'bidaf':
+        if os.environ.get('KATECHEO_COMP') is not None:
+            if os.environ.get('KATECHEO_COMP').lower() == 'bidaf':
                 self.model = pretrained.bidirectional_attention_flow_seo_2017()
                 self.bidaf = True
             else:
