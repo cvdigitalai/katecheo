@@ -62,6 +62,10 @@ class ReadingComp(object):
             
             self.result = meta['tags']
             self.result['comprehension_error'] = ''
+            if self.bidaf:
+                self.result['comprehension_model'] = 'BiDAF'
+            else:
+                self.result['comprehension_model'] = 'BERT'
             return prediction
 
         self.result = meta['tags']
