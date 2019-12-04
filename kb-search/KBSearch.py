@@ -99,7 +99,7 @@ class KBSearch(object):
         
         return text
 
-    def get_article_with_highest_cos_similarity(self, corpus, cos_similarity):
+    def get_matching_article(self, corpus, cos_similarity):
     
         max_cosine_similarity = 0
         article_index = 0
@@ -115,7 +115,6 @@ class KBSearch(object):
         return article_index, max_cosine_similarity
     
     def predict(self, X, feature_names, meta):
-        
         if 'tags' in meta and 'question' in meta['tags'] and meta['tags']['question']:
 
             # Get the input message string.
@@ -126,7 +125,7 @@ class KBSearch(object):
 
             # Calculate the cosine similarity of a question wrt. to the combined corpus
             cos_similarity = cosine_similarity(self.knowledge_base_vectorized, vectorized_text).flatten()
-            article_index, article_cos_similarity = self.get_article_with_highest_cos_similarity(
+            article_index, article_cos_similarity = self.get_matching_article(
                 self.common_knowledge_base_clean, cos_similarity
             )
 
