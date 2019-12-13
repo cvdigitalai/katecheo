@@ -2,6 +2,11 @@ import os
 import re
 import copy
 import json
+import nltk
+
+nltk.download('stopwords')
+nltk.download('punkt')
+
 import string
 import urllib
 import numpy as np
@@ -154,7 +159,6 @@ class KBSearch(object):
                 self.result['article_id'] = self.common_knowledge_base[
                     article_index][os.environ['ARTICLE_ID']]
                 self.result['kb_search_error'] = ""
-                print(self.result)
                 return X
             else:
                 self.result['on_topic'] = False
@@ -162,7 +166,6 @@ class KBSearch(object):
                 self.result['article_id'] = ""
                 self.result[
                     'kb_search_error'] = 'Could not match "' + message_text + '" to any of the articles from the knowledge base'
-                print(self.result)
                 return X
         else:
             self.result = meta['tags']
