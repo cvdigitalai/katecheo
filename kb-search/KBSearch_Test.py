@@ -4,9 +4,15 @@
 import unittest
 import json
 import os
-os.environ[
-    'KATECHEO_KB'] = 'faith=https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_gq_6k_general.json,health=https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_health.json'
+
 import KBSearch
+
+os.environ[
+    'KATECHEO_KB'] = 'faith=https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_gq_6k_general.json,health=https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_wedmd_health.json'
+os.environ['ARTICLE_ID'] = 'article_url'
+os.environ['ARTICLE_TITLE_KEY'] = 'title'
+os.environ['ARTICLE_BODY_KEY'] = 'body'
+os.environ['COSINE_SIMILARITY_THRESHOLD'] = '0.19'
 
 
 class KBSearch_Test(unittest.TestCase):
@@ -14,24 +20,22 @@ class KBSearch_Test(unittest.TestCase):
         self.search = KBSearch.KBSearch()
 
     def test_topic_health(self):
-        params = ['Does some food increase pollen allergy symptoms?', 'health']
+        params = ['Can acupuncture help me loose weight?']
 
-        response = self.search.predict(
-            params, "features", {'tags': {
-                'proceed': True,
-                "topic": "health"
-            }})
+        response = self.search.predict(params, "features",
+                                       {'tags': {
+                                           'question': True
+                                       }})
         print("health response", response)
         self.assertIsNotNone(response)
 
     def test_topic_faith(self):
-        params = ['Is Christianity a true religion?', 'faith']
+        params = ['What about different Christian denominations?']
 
-        response = self.search.predict(
-            params, "features", {'tags': {
-                'proceed': True,
-                "topic": "faith"
-            }})
+        response = self.search.predict(params, "features",
+                                       {'tags': {
+                                           'question': True
+                                       }})
         print("faith response", response)
         self.assertIsNotNone(response)
 

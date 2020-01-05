@@ -45,7 +45,7 @@ class ReadingComp(object):
         """
 
         # logic from parent
-        if 'tags' in meta and 'kb_article' in meta['tags'] and meta['tags']['kb_article'] == True:
+        if 'tags' in meta and 'on_topic' in meta['tags'] and meta['tags']['on_topic'] == True:
             if len(X) != 2:
                 self.result = meta['tags']
                 self.result['comprehension_error'] = 'No Article Text'
