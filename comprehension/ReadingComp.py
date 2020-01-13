@@ -1,7 +1,7 @@
 import os
 
 import torch
-from transformers import *
+from transformers import pipeline
 from allennlp import pretrained
 
 class ReadingComp(object):
@@ -12,7 +12,7 @@ class ReadingComp(object):
 
     def __init__(self):
         """
-            During initialization, setup Hugging Face's DistilBERT (by default), or AllenNLP's implementation
+            During initialization, setup Hugging Face's BERT Implementation (by default), or AllenNLP's implementation
             of BiDAF if specified via environmental variable.
         """
 
@@ -23,11 +23,9 @@ class ReadingComp(object):
                 self.model = pretrained.bidirectional_attention_flow_seo_2017()
                 self.bidaf = True
             else:
-                self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-                self.model = DistilBertForQuestionAnswering.from_pretrained('distilbert-base-uncased-distilled-squad')
+                self.model = pipeline('question-answering')
         else:
-            self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-            self.model = DistilBertForQuestionAnswering.from_pretrained('distilbert-base-uncased-distilled-squad')
+            self.model = pipeline('question-answering')
 
     def predict(self, X, feature_names, meta):
         """
@@ -55,10 +53,7 @@ class ReadingComp(object):
                 prediction = self.model.predict(passage=str(X[0]),
                                             question=str(X[1]))['best_span_str']
             else:
-                indexed_tokens = self.tokenizer.encode(str(X[0]), str(X[1]), add_special_tokens=True)
-                tokens_tensor = torch.tensor([indexed_tokens])
-                start_logits, end_logits = self.model(tokens_tensor)
-                prediction = self.tokenizer.decode(indexed_tokens[torch.argmax(start_logits):torch.argmax(end_logits)+1])
+                prediction = self.model({'question': str(X[1]), 'context': str(X[0])})['answer']
             
             self.result = meta['tags']
             self.result['comprehension_error'] = ''
