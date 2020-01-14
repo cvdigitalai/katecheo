@@ -10,16 +10,11 @@ args = parser.parse_args()
 with open('config.json', 'r') as f:
     config = json.load(f)
 
-ner_entries = []
 kb_entries = []
 
-for topic in config:
-    ner_entry = topic['name'] + '=' + topic['ner_model']
-    ner_entries.append(ner_entry)
+for topic in config["model"]:
     kb_entry = topic['name'] + '=' + topic['kb_file']
     kb_entries.append(kb_entry)
 
-if args.target == 'ner':
-    print(','.join(ner_entries).replace('/', '\/'))
-else:
+if args.target == 'kb':
     print(','.join(kb_entries).replace('/', '\/'))

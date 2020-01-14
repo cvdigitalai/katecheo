@@ -52,7 +52,7 @@
                            "env":[
                               {
                                  "name":"KATECHEO_KB",
-				 "value":"KBSUB"
+                                 "value":"KBSUB"
                               }
                            ]
                         },

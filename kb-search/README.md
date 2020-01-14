@@ -3,7 +3,7 @@
 ## Build
 
 ```
-$ s2i build . seldonio/seldon-core-s2i-python3:0.10 cvdigital/kb_search:<TAG>
+$ s2i build . seldonio/seldon-core-s2i-python3:0.7 cvdigital/kb_search:<TAG>
 
 $ docker push cvdigital/kb_search:<TAG>
 ```
