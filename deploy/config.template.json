@@ -3,6 +3,7 @@
     "article_title_key": "title",
     "article_body_key": "body",
     "similarity_threshold": "0.19",
+    "comprehension_model": "bert",
     "model": [
         {
             "name": "faith",
