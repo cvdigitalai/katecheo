@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser(description='Process JSON config file.')
 parser.add_argument('target', type=str, help='NER or KB target to set')
 args = parser.parse_args()
 
-with open('config.template.json', 'r') as f:
+with open('config.json', 'r') as f:
     config = json.load(f)
 
 kb_entries = []

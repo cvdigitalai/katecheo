@@ -80,28 +80,19 @@
                 "graph":{
                     "children":[
                         {
-                            "name":"target-classifier",
+                            "name":"kb-search",
                             "endpoint":{
                                 "type":"REST"
                             },
                             "type":"MODEL",
                             "children":[
                                 {
-                                    "name":"kb-search",
+                                    "name":"comprehension",
                                     "endpoint":{
                                         "type":"REST"
                                     },
                                     "type":"MODEL",
-                                    "children":[
-                                        {
-                                            "name":"comprehension",
-                                            "endpoint":{
-                                                "type":"REST"
-                                            },
-                                            "type":"MODEL",
-                                            "children":[]
-                                        }
-                                    ]
+                                    "children":[]
                                 }
                             ]
                         }
