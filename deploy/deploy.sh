@@ -3,10 +3,10 @@
 # Set env vars
 KATECHEO_KB=$(python deploy.py kb)
 ARTICLE_ID=$(python deploy.py article_id)
-ARTICLE_TITLE_KEY=$(python deploy.py article_title)
-ARTICLE_BODY_KEY=$(python deploy.py article_body)
-COSINE_SIMILARITY_THRESHOLD=$(python deploy.py sim_threshold)
-KATECHEO_COMP=$(python deploy.py comp_model)
+ARTICLE_TITLE_KEY=$(python deploy.py article_title_key)
+ARTICLE_BODY_KEY=$(python deploy.py article_body_key)
+COSINE_SIMILARITY_THRESHOLD=$(python deploy.py similarity_threshold)
+KATECHEO_COMP_MODEL=$(python deploy.py comprehension_model)
 
 # Substitute the values in the deployment files
 cp deployment.template.json deployment.json
