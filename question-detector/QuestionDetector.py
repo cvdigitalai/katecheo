@@ -25,7 +25,7 @@ class QuestionDetector(object):
             self.result['question_detector_error'] = ''
         else:
             self.result['question'] = False
-            self.result['question_detector_error'] = 'Not Question'
+            self.result['question_detector_error'] = 'This is not a question'
 
         return X
 
