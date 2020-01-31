@@ -2,7 +2,7 @@
 
 Katecheo is a modular system for topical question answering built on Kubernetes. It is portable to any Kubernetes cluster (in the cloud or on-prem), and it allows developers to integrate state-of-the-art questions answering into their applications via its REST API.  
 
-Check out [this screencast](https://youtu.be/g51t6eRX2Y8) to see Katecheo in action!
+Check out [this screencast](https://youtu.be/dyhkLuq4Lo8) to see Katecheo in action!
 
 ## Deploy Katecheo
 
