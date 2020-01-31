@@ -18,6 +18,7 @@ class ReadingComp_Test(unittest.TestCase):
 
         response = self.comprehension.predict(
             params, "features", {'tags': {
+                'on_topic': True,
                 'kb_search_error': "some error"
             }})
         self.assertIsNotNone(response)

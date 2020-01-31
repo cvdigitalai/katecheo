@@ -1,17 +1,21 @@
-[
-	{
-		"name": "topic 1",
-		"ner_model": "https://www.google.com/",
-		"kb_file": "https://www.google.com/"
-	},
-	{
-		"name": "topic 2",
-		"ner_model": "https://www.google.com/",
-		"kb_file": "https://www.google.com/"
-	},
-	{
-		"name": "topic N",
-		"ner_model": "https://www.google.com/",
-		"kb_file": "https://www.google.com/"
-	}
-]
+{
+    "article_id": "id",
+    "article_title_key": "title",
+    "article_body_key": "body",
+    "similarity_threshold": "0.19",
+    "comprehension_model": "bert",
+    "model": [
+        {
+            "name": "topic 1",
+            "kb_file": "https://www.google.com/"
+        },
+        {
+            "name": "topic 2",
+            "kb_file": "https://www.google.com/"
+        },
+        {
+            "name": "topic N",
+            "kb_file": "https://www.google.com/"
+        }
+    ]
+}

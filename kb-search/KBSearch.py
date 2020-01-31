@@ -1,175 +1,175 @@
+import os
+import re
+import copy
+import json
+import nltk
+
+nltk.download('stopwords')
+nltk.download('punkt')
+
+import string
+import urllib
+import numpy as np
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
-from nltk.corpus import stopwords
-import json
-import numpy as np
-import os
-import urllib.request
 
 
 class KBSearch(object):
     """
-    KBSearch searches for a phrase in the list of knowledge base articles' title field. It uses FuzzyWuzzy for matching
-
-    The knowledge base articles list is in JSON list format and stored in the cloud
+    KBSearch searches uses 'cosine similarity' to measure the similarity between
+    a given phrase and an article from a knowledge base.
     """
-    vectorizer = {}
-    allDocs = {}
-    allVector = {}
-    corpus = {}
-    availableKB = []
+    tfidf_vectorizer = None
+    vectorized_knowledge_base = None
+    common_knowledge_base = []
+    common_knowledge_base_clean = []
     result = {}
 
     def __init__(self):
-        """
-        During initialization:
-        
-        - titles for each topic are read from 'knowledge base list' and stored in 'records' with this format:
+        '''
+            Parse through the environment variable 'KATECHEO_KB' string.
+            - Each knowledge base and it's information is separated by ','
+            - A specific topic and it's knowledge base URL is separated by '='
 
-            records['health']['health_article1'] = {'title': 'health_article1', 'body': '---'}
-                            ['health_article2'] = {'title': 'health_article2', 'body': '---'}
-                            ['health_article3'] = {'title': 'health_article3', 'body': '---'}
-                            ...
-                            ['health_articleN'] = {'title': 'health_articleN', 'body': '---'}
+            Create an object which holds the information of the knowledge bases in the
+            format shown below:
+            {
+                "topic_1": "knowledge_base_1_url",
+                "topic_2": "knowledge_base_2_url",
+                ...
+            }
+        '''
+        kb_info = [
+            sentence.split('=')
+            for sentence in os.environ['KATECHEO_KB'].split(',')
+        ]
 
-            records['faith']['faith_article1'] = {'title': 'faith_article1', 'body': '---'}
-                            ['faith_article2'] = {'title': 'faith_article2', 'body': '---'}
-                            ['faith_article3'] = {'title': 'faith_article3', 'body': '---'}
-                            ...
-                            ['faith_articleN'] = {'title': 'faith_articleN', 'body': '---'}
+        knowledge_bases_raw_data = {}
 
-            Note that in "records['health']['health_article1']", the title 'health_article1' is also the key to that element in the list
+        # Iterate through the different knowledge bases.
+        for kb in kb_info:
+            topic = kb[0]
+            kb_url = kb[1]
 
+            # Download the knowledge base files.
+            urllib.request.urlretrieve(kb_url, os.path.basename(kb_url))
 
-        - Another list of just the titles is stored in this format:
+            # Load the downloaded JSON files.
+            with open(os.path.basename(kb_url)) as f:
+                knowledge_bases_raw_data[topic] = json.load(f)
 
-            titles = ['title1', 'title2', ... 'titleN']
+        # Iterate through each article from each topic and get only the
+        # article ID, title and body of each article.
+        for topic in knowledge_bases_raw_data:
+            for article in knowledge_bases_raw_data[topic]:
+                if os.environ['ARTICLE_ID'] and os.environ[
+                        'ARTICLE_TITLE_KEY'] and os.environ['ARTICLE_BODY_KEY']:
+                    self.common_knowledge_base.append({
+                        os.environ['ARTICLE_ID']:
+                        article[os.environ['ARTICLE_ID']],
+                        "content":
+                        article[os.environ['ARTICLE_TITLE_KEY']] + " " +
+                        article[os.environ['ARTICLE_BODY_KEY']],
+                        "topic":
+                        topic
+                    })
 
+        # The 'copy.deepcopy()' method helps in copying the value of variable rather
+        # than creating a reference which is what python does by default.
+        self.common_knowledge_base_clean = copy.deepcopy(
+            self.common_knowledge_base)
 
-        - The configuration variable KATECHEO_KB comes from the environment and it would typically look like this:
-            'health=https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_health.json,faith=https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_faith.json'
+        # Clean-up the content of the articles.
+        for article in self.common_knowledge_base_clean:
+            article["content"] = self.clean_text_and_remove_stopwords(
+                article["content"])
 
-            The above example has two topics: 'health' and 'faith'. Each element in the list also has a URL to the corresponding knowledge base list
-        """
+        # Create a Bag of Word for the "combined (topic1 + topic2 + ...)" data using TF-IDF
+        self.tfidf_vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+        kb_content = [
+            doc['content'] for doc in self.common_knowledge_base_clean
+        ]
+        self.tfidf_vectorizer.fit(kb_content)
+        self.knowledge_base_vectorized = self.tfidf_vectorizer.transform(
+            kb_content)
 
-        # Parse through KATECHEO_KB to get topic and associated knowledge base file
-        kb_list = os.environ['KATECHEO_KB'].split(',')
-        self.availableKB = []
-        for kb_file in kb_list:
-            parts = kb_file.split('=')
-            self.availableKB.append({'topic': parts[0], 'url': parts[1]})
-            self.downloadFile(parts[1])
+    def clean_text_and_remove_stopwords(self, text):
 
-        for kb in self.availableKB:
-            with open(os.path.basename(kb['url'])) as json_file:
-                self.corpus[kb['topic']] = json.load(json_file)
+        # Remove punctuations
+        text = re.sub('[%s]' % re.escape(string.punctuation), ' ', text)
 
-                self.allDocs[kb['topic']] = []
+        # Remove unnecessary white space.
+        text = re.sub(r'\s+', ' ', text).strip()
 
-                for doc in self.corpus[kb['topic']]:
-                    self.allDocs[kb['topic']].append(
-                        str(doc['title']) + " " + str(doc['body']))
+        # Convert every word to lowercase.
+        text = text.lower()
 
-                self.vectorizer[kb['topic']] = TfidfVectorizer(
-                    ngram_range=(1, 2))  #
-                self.allVector[kb['topic']] = self.vectorizer[
-                    kb['topic']].fit_transform(self.allDocs[kb['topic']])
+        # Tokenize each word and remove common stop words in English.
+        stop_words = set(stopwords.words('english'))
+        word_tokens = word_tokenize(text)
+        filtered_tokens = [w for w in word_tokens if not w in stop_words]
+        text = " ".join(filtered_tokens)
 
-    def downloadFile(self, url):
-        """
-        Helper function to download knowledge base files
-        """
-        urllib.request.urlretrieve(url, os.path.basename(url))
-        return
+        return text
 
-    def predict(self, X, features_names, meta):
-        """
-        Searches for a phrase in topic's knowledge base list using FuzzyWuzzy matching
+    def get_matching_article(self, corpus, cos_similarity):
 
-        Parameters
-        ----------
-        X[0]
-            The phrase to be searched
-        X[1]
-            The topic in which the search has to be made
+        max_cosine_similarity = 0
+        article_index = 0
 
-        Returns
-        -------
-        response:
-            The element in knowledge base list which matched the search phrase
-        """
+        for index, _ in enumerate(corpus):
 
-        question = ""
+            # Get the article from the combined knowledge base with the highest
+            # cosine similarity to the question.
+            if cos_similarity[index] > max_cosine_similarity:
+                max_cosine_similarity = cos_similarity[index]
+                article_index = index
 
-        # Logic from parent
-        if 'tags' in meta and 'topic' in meta['tags'] and len(meta['tags']['topic']) > 0:
-            didNotMatchAvailableTopics = True
-            for kb in self.availableKB:
-                if meta['tags']['topic'] == kb['topic']:
-                    didNotMatchAvailableTopics = False
-                    question = X[0]
+        return article_index, max_cosine_similarity
 
-                    questionVector = self.vectorizer[kb['topic']].fit(
-                        self.allDocs[kb['topic']])
-                    questionVector = questionVector.transform([question])
+    def predict(self, X, feature_names, meta):
+        if 'tags' in meta and 'question' in meta['tags'] and meta['tags'][
+                'question']:
 
-                    # Cosine Similarity
-                    cosineSimilarity = cosine_similarity(
-                        self.allVector[kb['topic']], questionVector).flatten()
+            # Get the input message string.
+            message_text = str(X[0]).lower()
 
-                    foundFlag = False
-                    maxIndex = 0
-                    maxCos = 0
+            # Vectorize the input message using the trained TF-IDF vectorizer.
+            vectorized_text = self.tfidf_vectorizer.transform([message_text])
 
-                    for index, doc in enumerate(self.corpus[kb['topic']], 0):
-                        doc['cos_value'] = cosineSimilarity[index]
+            # Calculate the cosine similarity of a question wrt. to the combined corpus
+            cos_similarity = cosine_similarity(self.knowledge_base_vectorized,
+                                               vectorized_text).flatten()
+            article_index, article_cos_similarity = self.get_matching_article(
+                self.common_knowledge_base_clean, cos_similarity)
 
-                    for index, doc in enumerate(self.corpus[kb['topic']], 0):
-                        if cosineSimilarity[index] > maxCos:
-                            foundFlag = True
-                            maxCos = cosineSimilarity[index]
-                            maxIndex = index
+            # We assign a match as on_topic if it is above or equal to the
+            # cosine similarity threshold value.
+            if article_cos_similarity >= float(
+                    os.environ['COSINE_SIMILARITY_THRESHOLD']):
 
-                    if foundFlag:
-                        article_source = ""
-                        if "article_url" in self.corpus[kb['topic']][maxIndex]:
-                            article_source = str(self.corpus[kb['topic']]
-                                                 [maxIndex]['article_url'])
-                        else:
-                            article_source = str(
-                                self.corpus[kb['topic']][maxIndex]['body'])
-
-                        X = np.append(
-                            [str(self.corpus[kb['topic']][maxIndex]['body'])],
-                            X)
-
-                        self.result = meta['tags']
-
-                        self.result["kb_article"] = True
-                        self.result["article_source"] = article_source
-                        self.result['kb_search_error'] = ""
-                        return X
-
-            # Notify caller that something went wrong
-            if didNotMatchAvailableTopics:
-                self.result = meta['tags']
-
-                self.result["kb_article"] = False
-                self.result["article_source"] = ""
-                self.result['kb_search_error'] = 'KB for topic \"' + meta[
-                    'tags']['topic'] + '\" not found'
+                # Retrieve the body of the matched article.
+                X = np.append(
+                    [self.common_knowledge_base[article_index]['content']], X)
+                self.result['on_topic'] = True
+                self.result['topic'] = self.common_knowledge_base[
+                    article_index]['topic']
+                self.result['article_id'] = self.common_knowledge_base[
+                    article_index][os.environ['ARTICLE_ID']]
+                self.result['kb_search_error'] = ""
                 return X
-
+            else:
+                self.result['on_topic'] = False
+                self.result['topic'] = ""
+                self.result['article_id'] = ""
+                self.result[
+                    'kb_search_error'] = 'Could not match "' + message_text + '" to any of the articles from the knowledge base'
+                return X
+        else:
             self.result = meta['tags']
-            self.result["kb_article"] = False
-            self.result["article_source"] = ""
-            self.result[
-                'kb_search_error'] = 'Could not match "' + question + '" with any article on the topic of "' + meta[
-                    'tags']['topic'] + '"'
             return X
-
-        self.result = meta['tags']
-        return X
 
     def tags(self):
         return self.result

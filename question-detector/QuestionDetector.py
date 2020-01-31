@@ -25,7 +25,7 @@ class QuestionDetector(object):
             self.result['question_detector_error'] = ''
         else:
             self.result['question'] = False
-            self.result['question_detector_error'] = 'Not Question'
+            self.result['question_detector_error'] = 'This is not a question'
 
         return X
 
@@ -51,7 +51,7 @@ class QuestionID:
     def predict(self, sentence: str):
         questionStarters = [
             "which", "wont", "cant", "isnt", "arent", "is", "do", "does",
-            "will", "can", "is"
+            "will", "can"
         ]
         questionElements = [
             "who", "what", "when", "where", "why", "how", "sup", "?"
@@ -62,7 +62,7 @@ class QuestionID:
         sentence = self.padCharacter('?', sentence)
         splitWords = sentence.split()
 
-        if any(word in splitWords[0] for word in questionStarters) or any(
+        if any(word == splitWords[0] for word in questionStarters) or any(
                 word in splitWords for word in questionElements):
             return True
         else:
