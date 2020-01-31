@@ -2,10 +2,7 @@
 
 Katecheo is a modular system for topical question answering built on Kubernetes. It is portable to any Kubernetes cluster (in the cloud or on-prem), and it allows developers to integrate state-of-the-art questions answering into their applications via its REST API.  
 
-You can learn more about Katecheo in:
-
-- This [this screencast](https://youtu.be/g51t6eRX2Y8)
-- Our [system demonstration paper](https://arxiv.org/abs/1907.00854)
+Check out [this screencast](https://youtu.be/g51t6eRX2Y8) to see Katecheo in action!
 
 ## Deploy Katecheo
 
@@ -19,12 +16,7 @@ Katecheo runs on Kubernetes and utilizes Seldon to serve predictions. You will n
 
 ### Data/model Preparation
 
-To classify input messages according to topic, Katecheo requires a pre-trained [spaCy](https://spacy.io/usage/models) NER model trained to detect topical entities. To match topical questions with appropriate knowledge base articles, Katecheo relies on a dataset of knowledge base articles with their corresponding titles.
-
-You will need the following for each topic you want to enable in Katecheo:
-
-- A pre-trained spaCy NER model all bundled into a single zip file
-- A JSON file containing Knowledge base articles (structure as shown [here](https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_health.json))
+To match topical questions with appropriate knowledge base articles, Katecheo relies on one or more sets of knowledge base articles (one per topic of interest, e.g., one for sports or one for health). For each topic you want to enable in Katecheo, you will need a JSON file containing Knowledge base articles (structure as shown [here](https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_medical_small.json))
 
 ### Deploy
 
@@ -36,21 +28,26 @@ You will need the following for each topic you want to enable in Katecheo:
     $ cd deploy && cp config.template.json config.json
     ```
 
-3. Fill in the links to your NER model(s) and knowledge base article files in `config.json`. When you are done, the config file should look something like the following (for a scenario when we are enabling Q&A in two topics: faith, or _Christianity_, and health, or _Medical Sciences_):
+3. Modify the `config.json` file according to your deployment by, at the minimum, filling in the links to your knowledge base article files and the field names representing your article IDs, article titles, and article bodies in the article files. You can also optionally modify the similarity threshold used by Katecheo when matching quesitons to articles and the comprehension model used by Katecheo (either `bert` or `bidaf`). When you are done, the config file should look something like the following (for a scenario when we are enabling Q&A in two topics: _Christianity_ and _Medical Sciences_):
 
     ```
-    [
-      {
-        "name": "faith",
-        "ner_model": "https://storage.googleapis.com/pachyderm-neuralbot/ner_models/faith.zip",
-        "kb_file": "https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_faith.json"
-      },
-      {
-        "name": "health",
-        "ner_model": "https://storage.googleapis.com/pachyderm-neuralbot/ner_models/health.zip",
-        "kb_file": "https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_health.json"
-      }
-    ]
+    {
+        "article_id": "title",
+        "article_title_key": "title",
+        "article_body_key": "body",
+        "similarity_threshold": "0.15",
+        "comprehension_model": "bert",
+        "model": [
+            {
+                "name": "Christianity",
+                "kb_file": "https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_christianity_small.json"
+            },
+            {
+                "name": "Medical Sciences",
+                "kb_file": "https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_medical_small.json"
+            }
+        ]
+    }
     ```
 
 4. Make sure your local `kubectl` is connected to your cluster.
@@ -61,14 +58,14 @@ You will need the following for each topic you want to enable in Katecheo:
     $ ./deploy.sh
     ```
     
-6. This will deploy all of the Katecheo modules to your cluster. Once the Katecheo pod is in a `running` state, you will be able to serve multi-topic answers at the following endpoint: `http://<ingress IP>/seldon/default/katecheo/api/v0.1/predictions`
+6. This will deploy all of the Katecheo modules to your cluster. Once the Katecheo pod is in a `running` state, you will be able to serve multi-topic answers at the following endpoint: `http://<ingress IP>/seldon/default/katecheo/api/v0.1/predictions`. You can usually find the `<ingress IP>` using the `kubectl get svc` command and looking for the public IP for, e.g., ambassador. 
 
 ## Usage
 
 Example request (Question):
 
 ```
-$ curl -X POST -H 'Content-Type: application/json' -d '{"data": {"names": ["message"], "ndarray": ["What does the Bible say about vegetarianism?"]}}' http://35.201.10.193/seldon/default/katecheo/api/v0.1/predictions
+$ curl -X POST -H 'Content-Type: application/json' -d '{"data": {"names": ["message"], "ndarray": ["How should you treat people with high risk factors for coronary heart disease?"]}}' http://<ingress IP>/seldon/default/katecheo/api/v0.1/predictions
 ```
 
 Example response (Answer):
@@ -76,25 +73,29 @@ Example response (Answer):
 ```
 {
   "meta": {
-    "puid": "nf7ukk5cur2dp8bcpe7qe53hsb",
+    "puid": "lftagepuvbpskvhaudpb4a8b14",
     "tags": {
-      "proceed": true,
-      "topic": "faith"
+      "article_id": "Can Prediabetes cause coronary heart disease?",
+      "comprehension_error": "",
+      "comprehension_model": "BERT",
+      "kb_search_error": "",
+      "on_topic": true,
+      "question": true,
+      "question_detector_error": "",
+      "topic": "Medical Sciences"
     },
     "routing": {
-      "target-classifier": -1,
       "question-detector": -1,
       "kb-search": -1
     },
     "requestPath": {
-      "target-classifier": "cvdigital/target-classifier:v0.1.0",
-      "question-detector": "cvdigital/question-detector:v0.1.0",
-      "comprehension": "cvdigital/comprehension:v0.1.0",
-      "kb-search": "cvdigital/kb-search:v0.1.0"
+      "question-detector": "cvdigital/question-detector:0.2rc",
+      "comprehension": "cvdigital/reading_comp:0.2rc",
+      "kb-search": "cvdigital/kb_search:0.2rc"
     },
     "metrics": []
   },
-  "strData": "I think you would be hard pressed to say that the Bible commands a vegetarian diet"
+  "strData": "aspirin and/or statins"
 }
 ```
 
@@ -102,9 +103,9 @@ Example response (Answer):
 
 In the future we intend to:
 
-- Extend our knowledge base search methodology (e.g., to use bigrams and TF-IDF)
+- Extend our knowledge base search methodology (e.g., to use bigrams and/or more sophisticated language models)
 - Enable usage of a wider variety of pre-trained models (BERT, XLNet, etc.)
-- Explore other topic matching/modeling techniques to remove our NER model dependency (non-negative matrix factorization and/or latent dirichlet allocation)
+- Allow users to dynamically switch similarity thresholds and/or comprehension models
 
 ## Citing
 
