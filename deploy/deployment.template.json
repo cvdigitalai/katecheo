@@ -10,7 +10,7 @@
     "spec":{
         "annotations":{
             "project_name":"Katecheo",
-            "deployment_version":"v0.1.0",
+            "deployment_version":"v0.2.0",
             "seldon.io/rest-read-timeout":"100000",
             "seldon.io/rest-connection-timeout":"100000",
             "seldon.io/grpc-read-timeout":"100000"
@@ -26,12 +26,12 @@
                             "containers":[
                                 {
                                     "name":"question-detector",
-                                    "image":"cvdigital/question-detector:v0.1.0",
+                                    "image":"cvdigital/question-detector:v0.2.0",
                                     "imagePullPolicy":"IfNotPresent"
                                 },
                                 {
-                                    "name":"kb-search",
-                                    "image":"cvdigital/kb-search:v0.1.0",
+                                    "name":"kb_search",
+                                    "image":"cvdigital/kb_search:v0.2.0",
                                     "imagePullPolicy":"IfNotPresent",
                                     "env":[
                                         {
@@ -58,7 +58,7 @@
                                 },
                                 {
                                     "name":"comprehension",
-                                    "image":"cvdigital/comprehension:v0.1.0",
+                                    "image":"cvdigital/comprehension:v0.2.0",
                                     "imagePullPolicy":"IfNotPresent",
                                     "env":[
                                         {
@@ -80,7 +80,7 @@
                 "graph":{
                     "children":[
                         {
-                            "name":"kb-search",
+                            "name":"kb_search",
                             "endpoint":{
                                 "type":"REST"
                             },
