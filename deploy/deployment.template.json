@@ -30,8 +30,8 @@
                                     "imagePullPolicy":"IfNotPresent"
                                 },
                                 {
-                                    "name":"kb_search",
-                                    "image":"cvdigital/kb_search:v0.2.0",
+                                    "name":"kb-search",
+                                    "image":"cvdigital/kb-search:v0.2.0",
                                     "imagePullPolicy":"IfNotPresent",
                                     "env":[
                                         {
@@ -80,7 +80,7 @@
                 "graph":{
                     "children":[
                         {
-                            "name":"kb_search",
+                            "name":"kb-search",
                             "endpoint":{
                                 "type":"REST"
                             },
