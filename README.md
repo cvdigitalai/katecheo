@@ -62,6 +62,8 @@ To match topical questions with appropriate knowledge base articles, Katecheo re
 
 ## Usage
 
+### Via REST API 
+
 Example request (Question):
 
 ```
@@ -98,6 +100,12 @@ Example response (Answer):
   "strData": "aspirin and/or statins"
 }
 ```
+
+### Example Streamlit app
+
+![katecheo](katecheo.gif)
+
+We've also created an example [Streamlit app](https://www.streamlit.io/) to demonstrate Katecheo. Details on running the application are included [here](demo).
 
 ## Future extensions
 
