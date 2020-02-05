@@ -64,14 +64,14 @@ class KBSearch(object):
         # article ID, title and body of each article.
         for topic in knowledge_bases_raw_data:
             for article in knowledge_bases_raw_data[topic]:
-                if os.environ['ARTICLE_ID'] and os.environ[
-                        'ARTICLE_TITLE_KEY'] and os.environ['ARTICLE_BODY_KEY']:
+                if os.environ['KATECHEO_ARTICLE_ID'] and os.environ[
+                        'KATECHEO_ARTICLE_TITLE_KEY'] and os.environ['KATECHEO_ARTICLE_BODY_KEY']:
                     self.common_knowledge_base.append({
-                        os.environ['ARTICLE_ID']:
-                        article[os.environ['ARTICLE_ID']],
+                        os.environ['KATECHEO_ARTICLE_ID']:
+                        article[os.environ['KATECHEO_ARTICLE_ID']],
                         "content":
-                        article[os.environ['ARTICLE_TITLE_KEY']] + " " +
-                        article[os.environ['ARTICLE_BODY_KEY']],
+                        article[os.environ['KATECHEO_ARTICLE_TITLE_KEY']] + " " +
+                        article[os.environ['KATECHEO_ARTICLE_BODY_KEY']],
                         "topic":
                         topic
                     })
@@ -148,7 +148,7 @@ class KBSearch(object):
             # We assign a match as on_topic if it is above or equal to the
             # cosine similarity threshold value.
             if article_cos_similarity >= float(
-                    os.environ['COSINE_SIMILARITY_THRESHOLD']):
+                    os.environ['KATECHEO_COSINE_SIMILARITY_THRESHOLD']):
 
                 # Retrieve the body of the matched article.
                 X = np.append(
@@ -157,7 +157,7 @@ class KBSearch(object):
                 self.result['topic'] = self.common_knowledge_base[
                     article_index]['topic']
                 self.result['article_id'] = self.common_knowledge_base[
-                    article_index][os.environ['ARTICLE_ID']]
+                    article_index][os.environ['KATECHEO_ARTICLE_ID']]
                 self.result['kb_search_error'] = ""
                 return X
             else:

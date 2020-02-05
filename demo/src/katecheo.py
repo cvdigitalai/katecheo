@@ -6,8 +6,8 @@ import streamlit as st
 question = ""
 topics = []
 
-if "KB_TOPICS" in os.environ and os.environ["KB_TOPICS"]:
-    topics = os.environ["KB_TOPICS"].split(";")
+if "KATECHEO_KB_TOPICS" in os.environ and os.environ["KATECHEO_KB_TOPICS"]:
+    topics = os.environ["KATECHEO_KB_TOPICS"].split(";")
 
 st.title("Katecheo")
 
