@@ -148,7 +148,7 @@ class KBSearch(object):
             # We assign a match as on_topic if it is above or equal to the
             # cosine similarity threshold value.
             if article_cos_similarity >= float(
-                    os.environ['KATECHEO_COSINE_SIMILARITY_THRESHOLD']):
+                    os.environ['KATECHEO_SIMILARITY_THRESHOLD']):
 
                 # Retrieve the body of the matched article.
                 X = np.append(

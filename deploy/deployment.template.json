@@ -36,23 +36,23 @@
                                     "env":[
                                         {
                                             "name":"KATECHEO_KB",
-                                            "value":"KB_SUB"
+                                            "value":"KATECHEO_KB_SUB"
                                         },
                                         {
                                             "name":"KATECHEO_ARTICLE_ID",
-                                            "value":"ARTICLE_ID_SUB"
+                                            "value":"KATECHEO_ARTICLE_ID_SUB"
                                         },
                                         {
                                             "name":"KATECHEO_ARTICLE_TITLE_KEY",
-                                            "value":"ARTICLE_TITLE_SUB"
+                                            "value":"KATECHEO_ARTICLE_TITLE_SUB"
                                         },
                                         {
                                             "name":"KATECHEO_ARTICLE_BODY_KEY",
-                                            "value":"ARTICLE_BODY_SUB"
+                                            "value":"KATECHEO_ARTICLE_BODY_SUB"
                                         },
                                         {
-                                            "name":"KATECHEO_COSINE_SIMILARITY_THRESHOLD",
-                                            "value":"COSINE_SIMILARITY_THRESHOLD_SUB"
+                                            "name":"KATECHEO_SIMILARITY_THRESHOLD",
+                                            "value":"KATECHEO_SIMILARITY_THRESHOLD_SUB"
                                         }
                                     ]
                                 },
@@ -63,7 +63,7 @@
                                     "env":[
                                         {
                                             "name":"KATECHEO_COMP_MODEL",
-                                            "value":"COMPREHENSION_MODEL_SUB"
+                                            "value":"KATECHEO_COMP_MODEL_SUB"
                                         }
                                     ],
                                     "resources":{
