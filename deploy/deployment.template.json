@@ -26,12 +26,12 @@
                             "containers":[
                                 {
                                     "name":"question-detector",
-                                    "image":"cvdigital/question-detector:0.2.0",
+                                    "image":"cvdigital/question-detector:v0.2.0",
                                     "imagePullPolicy":"IfNotPresent"
                                 },
                                 {
                                     "name":"kb-search",
-                                    "image":"cvdigital/kb-search:0.2.0",
+                                    "image":"cvdigital/kb-search:v0.2.0",
                                     "imagePullPolicy":"IfNotPresent",
                                     "env":[
                                         {
@@ -58,7 +58,7 @@
                                 },
                                 {
                                     "name":"comprehension",
-                                    "image":"cvdigital/comprehension:0.2.0",
+                                    "image":"cvdigital/comprehension:v0.2.0",
                                     "imagePullPolicy":"IfNotPresent",
                                     "env":[
                                         {
