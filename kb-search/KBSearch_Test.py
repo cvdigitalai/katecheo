@@ -12,7 +12,7 @@ os.environ[
 os.environ['KATECHEO_ARTICLE_ID'] = 'article_url'
 os.environ['KATECHEO_ARTICLE_TITLE_KEY'] = 'title'
 os.environ['KATECHEO_ARTICLE_BODY_KEY'] = 'body'
-os.environ['KATECHEO_SIMILARITY_THRESHOLD'] = '0.19'
+os.environ['KATECHEO_SIMILARITY_THRESHOLD'] = '0.15'
 
 
 class KBSearch_Test(unittest.TestCase):
