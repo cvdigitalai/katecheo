@@ -35,7 +35,7 @@ To match topical questions with appropriate knowledge base articles, Katecheo re
         "article_id": "title",
         "article_title_key": "title",
         "article_body_key": "body",
-        "similarity_threshold": "0.15",
+        "article_similarity_threshold": "0.15",
         "comprehension_model": "bert",
         "model": [
             {
@@ -91,9 +91,9 @@ Example response (Answer):
       "kb-search": -1
     },
     "requestPath": {
-      "question-detector": "cvdigital/question-detector:0.2rc",
-      "comprehension": "cvdigital/reading_comp:0.2rc",
-      "kb-search": "cvdigital/kb_search:0.2rc"
+      "question-detector": "cvdigital/question-detector:v0.2.0",
+      "comprehension": "cvdigital/reading_comp:v0.2.0",
+      "kb-search": "cvdigital/kb_search:v0.2.0"
     },
     "metrics": []
   },

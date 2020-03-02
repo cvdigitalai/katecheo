@@ -9,10 +9,10 @@ import KBSearch
 
 os.environ[
     'KATECHEO_KB'] = 'faith=https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_gq_6k_general.json,health=https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_wedmd_health.json'
-os.environ['ARTICLE_ID'] = 'article_url'
-os.environ['ARTICLE_TITLE_KEY'] = 'title'
-os.environ['ARTICLE_BODY_KEY'] = 'body'
-os.environ['COSINE_SIMILARITY_THRESHOLD'] = '0.19'
+os.environ['KATECHEO_ARTICLE_ID'] = 'article_url'
+os.environ['KATECHEO_ARTICLE_TITLE_KEY'] = 'title'
+os.environ['KATECHEO_ARTICLE_BODY_KEY'] = 'body'
+os.environ['KATECHEO_SIMILARITY_THRESHOLD'] = '0.15'
 
 
 class KBSearch_Test(unittest.TestCase):

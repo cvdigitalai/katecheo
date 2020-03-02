@@ -3,6 +3,7 @@ FROM python:3.8.1-slim
 EXPOSE 8501
 
 ENV KATECHEO_URL=http://34.89.121.219/seldon/default/katecheo/api/v0.1/predictions
+# ENV KATECHEO_KB_TOPICS="topic_1;topic_2"
 
 WORKDIR /app
 COPY requirements.txt .
