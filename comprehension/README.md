@@ -3,7 +3,9 @@
 ## Build
 
 ```
-$ s2i build . seldonio/seldon-core-s2i-python3:0.7 cvdigital/comprehension:<TAG>
+$ docker build . -f Dockerfile -t seldonio/seldon-core-transformers-base:0.1
+
+$ s2i build . seldonio/seldon-core-transformers-base:0.1 cvdigital/comprehension:<TAG>
 
 $ docker push cvdigital/comprehension:<TAG>
 ```

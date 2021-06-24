@@ -2,7 +2,7 @@ import os
 
 import torch
 from transformers import pipeline
-from allennlp import pretrained
+# from allennlp import pretrained
 
 class ReadingComp(object):
     """
@@ -16,16 +16,17 @@ class ReadingComp(object):
             of BiDAF if specified via environmental variable.
         """
 
+        self.model = pipeline('question-answering')
         self.bidaf = False
 
-        if os.environ.get('KATECHEO_COMP_MODEL') is not None:
-            if os.environ.get('KATECHEO_COMP_MODEL').lower() == 'bidaf':
-                self.model = pretrained.bidirectional_attention_flow_seo_2017()
-                self.bidaf = True
-            else:
-                self.model = pipeline('question-answering')
-        else:
-            self.model = pipeline('question-answering')
+        # if os.environ.get('KATECHEO_COMP_MODEL') is not None:
+        #     if os.environ.get('KATECHEO_COMP_MODEL').lower() == 'bidaf':
+        #         self.model = pretrained.bidirectional_attention_flow_seo_2017()
+        #         self.bidaf = True
+        #     else:
+        #         self.model = pipeline('question-answering')
+        # else:
+        #     self.model = pipeline('question-answering')
 
     def predict(self, X, feature_names, meta):
         """

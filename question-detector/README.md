@@ -3,7 +3,7 @@
 ## Build
 
 ```
-$ s2i build . seldonio/seldon-core-s2i-python37:0.10 cvdigital/question-detector:<TAG>
+$ s2i build . seldonio/seldon-core-s2i-python37:1.7.0 cvdigital/question-detector:<TAG>
 
 $ docker push cvdigital/question-detector:<TAG>
 ```
