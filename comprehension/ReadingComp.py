@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import os
 
 
@@ -60,7 +60,7 @@ class ReadingComp(object):
             else:
                 prediction = self.model({'question': str(X[1]), 'context': str(X[0])})['answer']
             
-            print("Check-point: Got the value of Prediction Either by bidaf or by BERT")
+           
             self.result = meta['tags']
             self.result['comprehension_error'] = ''
             if self.bidaf:
@@ -68,11 +68,10 @@ class ReadingComp(object):
             else:
                 self.result['comprehension_model'] = 'BERT'
             
-            print("Prediction: ", prediction)
+            #print("Prediction: ", prediction)
             return prediction
 
         self.result = meta['tags']
-        print("End of func")
         return self.result
 
     
@@ -82,11 +81,10 @@ app = Flask(__name__)
 obj = ReadingComp()
 
 
+
 @app.route('/comprehension', methods=['POST'])
 def read_comprehension():
     inbound = request.json
-    print("inbound: ", str(inbound))
-    print("params: ", inbound['params'])
 
     #X = np.array([inbound['params']])
     X = inbound['params']
@@ -96,14 +94,17 @@ def read_comprehension():
             'on_topic': inbound['tags']['on_topic']
         }
     }
-    print("X: ", X)
-    print("meta: ", meta)
-
+   
     retval = obj.predict(X, None, meta)
-    print("\nretval: ", retval)
+    print("\n retval from ReadingComp: \n", retval, "\n")
+    print("\n Type of retval from ReadingComp:\n", type(retval), "\n")
 
+    resp_obj = {}
+    resp_obj["data"] = retval
+    resp_obj["question"] = inbound['tags']['question']
+    resp_obj["question"] = inbound['tags']['on_topic']
 
-    return "Ok, Alive", 200
+    return jsonify(resp_obj)
 
 if __name__ == "__main__":
     app.run('0.0.0.0', port=6080, debug=True) 

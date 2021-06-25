@@ -2,7 +2,6 @@
     python KBSearch_Test.py
 """
 import json
-import urllib.parse
 import urllib.request
 import unittest
 import pprint
@@ -31,7 +30,7 @@ class KBSearch_Test(unittest.TestCase):
             print(e)
             pass
 
-    
+    '''
     def test_topic_faith(self):
         payload = {
             "params": "What about different Christian denominations?",
@@ -49,6 +48,7 @@ class KBSearch_Test(unittest.TestCase):
         except requests.exceptions.RequestException as e:
             print(e)
             pass
+    '''
 
 if __name__ == '__main__':
     unittest.main()

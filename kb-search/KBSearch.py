@@ -208,14 +208,38 @@ def route_handler():
     }
    
     retval = kbs.predict(X, None, meta)
-    #print("retval: ", retval)
+    print("retval: ", retval)
+    print("~~~~~ Type: ",type(retval))
+
+    article = str(retval[0])
+    print("Response in retval:", article)
+    print("retval Response Type:", type(article))
+    
+
+    payload = {
+            "params" : [
+                article,
+                inbound['tags']['question']
+            ],
+            "tags": {
+                "question": inbound['tags']['question'],
+                'on_topic': True
+            }
+        }
+
+    try:
+        r = requests.post("http://localhost:6080/comprehension", data=json.dumps(payload), headers={'content-type':'application/json'}) 
+        #print("Response of API call: ", r.text)
+    except requests.exceptions.RequestException as e:
+        print(e)
+        pass
 
     response = {
         "dummyA": "reponseA",
         "dummyB": "reponseB"
     }
+    
     return json.dumps(response), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=6070, debug=True)
-
