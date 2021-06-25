@@ -106,4 +106,4 @@ def read_comprehension():
     return "Ok, Alive", 200
 
 if __name__ == "__main__":
-    app.run('0.0.0.0', port=6070, debug=True) 
+    app.run('0.0.0.0', port=6080, debug=True) 

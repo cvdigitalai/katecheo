@@ -42,7 +42,7 @@ class ReadingComp_Test(unittest.TestCase):
         print('\x1b[31m' + str(payload['params']) + '\x1b[0m')
 
         try:
-            r = requests.post("http://localhost:6070/comprehension", data=json.dumps(payload), headers={'content-type':'application/json'}) 
+            r = requests.post("http://localhost:6080/comprehension", data=json.dumps(payload), headers={'content-type':'application/json'}) 
             
         except requests.exceptions.RequestException as e:
             print(e)
