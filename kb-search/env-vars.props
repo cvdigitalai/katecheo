@@ -1,0 +1,5 @@
+KATECHEO_KB='faith=https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_gq_6k_general.json,health=https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_wedmd_health.json'
+KATECHEO_ARTICLE_ID='article_url'
+KATECHEO_ARTICLE_TITLE_KEY='title'
+KATECHEO_ARTICLE_BODY_KEY='body'
+KATECHEO_SIMILARITY_THRESHOLD='0.15'
