@@ -1,10 +1,7 @@
-from flask import Flask, request
 import os
-
 
 import torch
 from transformers import pipeline
-import numpy as np
 # from allennlp import pretrained
 
 class ReadingComp(object):
@@ -52,58 +49,23 @@ class ReadingComp(object):
                 self.result = meta['tags']
                 self.result['comprehension_error'] = 'No Article Text'
                 return ''
-            
+
             if self.bidaf:
                 prediction = self.model.predict(passage=str(X[0]),
                                             question=str(X[1]))['best_span_str']
-                
             else:
                 prediction = self.model({'question': str(X[1]), 'context': str(X[0])})['answer']
             
-            print("Check-point: Got the value of Prediction Either by bidaf or by BERT")
             self.result = meta['tags']
             self.result['comprehension_error'] = ''
             if self.bidaf:
                 self.result['comprehension_model'] = 'BiDAF'
             else:
                 self.result['comprehension_model'] = 'BERT'
-            
-            print("Prediction: ", prediction)
             return prediction
 
         self.result = meta['tags']
-        print("End of func")
+        return X
+
+    def tags(self):
         return self.result
-
-    
-
-app = Flask(__name__)
-
-obj = ReadingComp()
-
-
-@app.route('/comprehension', methods=['POST'])
-def read_comprehension():
-    inbound = request.json
-    print("inbound: ", str(inbound))
-    print("params: ", inbound['params'])
-
-    #X = np.array([inbound['params']])
-    X = inbound['params']
-    meta = {
-        "tags": {
-            "question": inbound['tags']['question'],
-            'on_topic': inbound['tags']['on_topic']
-        }
-    }
-    print("X: ", X)
-    print("meta: ", meta)
-
-    retval = obj.predict(X, None, meta)
-    print("\nretval: ", retval)
-
-
-    return "Ok, Alive", 200
-
-if __name__ == "__main__":
-    app.run('0.0.0.0', port=6070, debug=True) 
