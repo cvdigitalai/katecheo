@@ -44,11 +44,7 @@ model = QuestionID()
 
 @app.route('/questiondetector', methods=['POST'])
 def detect_question():
-    print(request.data)
-    print(request.json)
     inbound = request.json
-    print("Params: ", inbound["params"])
-
     result={}
     question = model.predict(inbound["params"])
     if question:

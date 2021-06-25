@@ -8,7 +8,7 @@ import requests
 
 import json
 import pprint
-import sys
+
 import unittest
 
 pp = pprint.PrettyPrinter(indent=2)
