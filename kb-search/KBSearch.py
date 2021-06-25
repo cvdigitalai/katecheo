@@ -1,3 +1,10 @@
+"""
+KBSearch searches uses 'cosine similarity' to measure the similarity between
+a given phrase and an article from a knowledge base.
+"""
+from flask import Flask, Response, jsonify, request
+import json
+
 import os
 import re
 import copy
@@ -14,6 +21,14 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
+
+app = Flask(__name__)
+
+tfidf_vectorizer = None
+vectorized_knowledge_base = None
+common_knowledge_base = []
+common_knowledge_base_clean = []
+result = {}
 
 
 class KBSearch(object):
@@ -32,7 +47,6 @@ class KBSearch(object):
             Parse through the environment variable 'KATECHEO_KB' string.
             - Each knowledge base and it's information is separated by ','
             - A specific topic and it's knowledge base URL is separated by '='
-
             Create an object which holds the information of the knowledge bases in the
             format shown below:
             {
@@ -47,7 +61,6 @@ class KBSearch(object):
         ]
 
         knowledge_bases_raw_data = {}
-        base_dir = "/data/"
 
         # Iterate through the different knowledge bases.
         for kb in kb_info:
@@ -55,10 +68,10 @@ class KBSearch(object):
             kb_url = kb[1]
 
             # Download the knowledge base files.
-            urllib.request.urlretrieve(kb_url, base_dir + os.path.basename(kb_url))
+            urllib.request.urlretrieve(kb_url, os.path.basename(kb_url))
 
             # Load the downloaded JSON files.
-            with open(base_dir + os.path.basename(kb_url)) as f:
+            with open(os.path.basename(kb_url)) as f:
                 knowledge_bases_raw_data[topic] = json.load(f)
 
         # Iterate through each article from each topic and get only the
@@ -172,5 +185,35 @@ class KBSearch(object):
             self.result = meta['tags']
             return X
 
-    def tags(self):
-        return self.result
+
+kbs = KBSearch()
+
+print("Ready to rx requests")
+
+
+@app.route('/kbsearch', methods=['POST'])
+def route_handler():
+    inbound = request.json
+    print("inbound: ", str(inbound))
+    print("params: ", inbound['params'])
+
+    X = np.array([inbound['params']])
+    meta = {
+        "tags": {
+            "question": inbound['tags']['question']
+        }
+    }
+    print("X: ", X)
+    print("meta: ", meta)
+    retval = kbs.predict(X, None, meta)
+    print("retval: ", retval)
+
+    response = {
+        "dummyA": "reponseA",
+        "dummyB": "reponseB"
+    }
+    return json.dumps(response), 200
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=6070, debug=True)
+
