@@ -1,5 +1,4 @@
-from flask import Flask, Response, request
-import requests
+from flask import Flask, request
 
 class QuestionID:
     """
@@ -47,6 +46,7 @@ def detect_question():
     inbound = request.json
     result={}
     question = model.predict(inbound["params"])
+    
     if question:
         result['question'] = True
         result['question_detector_error'] = ''
@@ -54,8 +54,7 @@ def detect_question():
         result['question'] = False
         result['question_detector_error'] = 'This is not a question'
     
-    print("Result:", result)
-    return "Ok", 200
+    return result
 
 if __name__=='__main__':
     app.run('0.0.0.0', port=6080, debug=True )
