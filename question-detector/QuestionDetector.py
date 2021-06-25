@@ -1,37 +1,4 @@
-class QuestionDetector(object):
-    """
-        QuestionDetector determines if the input text is actually a question
-    """
-    result = {}
-
-    def __init__(self):
-        """
-            During initialization, QuestionID is set as the model
-        """
-        self.model = QuestionID()
-
-    def predict(self, X, features_names):
-        """
-            Returns a prediction
-
-            Parameters
-            ----------
-            X : array-like
-            feature_names : array of feature names (optional)
-        """
-        question = self.model.predict(X[0])
-        if question:
-            self.result['question'] = True
-            self.result['question_detector_error'] = ''
-        else:
-            self.result['question'] = False
-            self.result['question_detector_error'] = 'This is not a question'
-
-        return X
-
-    def tags(self):
-        return self.result
-
+from flask import Flask, request
 
 class QuestionID:
     """
@@ -67,3 +34,28 @@ class QuestionID:
             return True
         else:
             return False
+
+
+app = Flask(__name__)
+
+model = QuestionID()
+
+
+@app.route('/questiondetector', methods=['POST'])
+def detect_question():
+    inbound = request.json
+    result={}
+    question = model.predict(inbound["params"])
+    
+    if question:
+        result['question'] = True
+        result['question_detector_error'] = ''
+    else:
+        result['question'] = False
+        result['question_detector_error'] = 'This is not a question'
+    
+    return result
+
+if __name__=='__main__':
+    app.run('0.0.0.0', port=6060, debug=True )
+    #serve(app, host='0.0.0.0', port=6080)

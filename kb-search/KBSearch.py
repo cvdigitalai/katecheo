@@ -10,17 +10,17 @@ import re
 import copy
 import json
 import nltk
-
-nltk.download('stopwords')
-nltk.download('punkt')
-
-import string
-import urllib
 import numpy as np
+import string
+import requests
+
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
+
+nltk.download('stopwords')
+nltk.download('punkt')
 
 app = Flask(__name__)
 
@@ -68,7 +68,13 @@ class KBSearch(object):
             kb_url = kb[1]
 
             # Download the knowledge base files.
-            urllib.request.urlretrieve(kb_url, os.path.basename(kb_url))
+            try:
+                r = requests.get(kb_url, allow_redirects=True)
+                open(os.path.basename(kb_url), 'wb').write(r.content)
+            except requests.exceptions.RequestException as e:
+                print("Error in downloading KB URL")
+                print(e)
+                return
 
             # Load the downloaded JSON files.
             with open(os.path.basename(kb_url)) as f:
@@ -188,14 +194,11 @@ class KBSearch(object):
 
 kbs = KBSearch()
 
-print("Ready to rx requests")
 
 
 @app.route('/kbsearch', methods=['POST'])
 def route_handler():
     inbound = request.json
-    print("inbound: ", str(inbound))
-    print("params: ", inbound['params'])
 
     X = np.array([inbound['params']])
     meta = {
@@ -203,17 +206,40 @@ def route_handler():
             "question": inbound['tags']['question']
         }
     }
-    print("X: ", X)
-    print("meta: ", meta)
+
     retval = kbs.predict(X, None, meta)
     print("retval: ", retval)
+    print("~~~~~ Type: ",type(retval))
+
+    article = str(retval[0])
+    print("Response in retval:", article)
+    print("retval Response Type:", type(article))
+
+
+    payload = {
+            "params" : [
+                article,
+                inbound['tags']['question']
+            ],
+            "tags": {
+                "question": inbound['tags']['question'],
+                'on_topic': True
+            }
+        }
+
+    try:
+        r = requests.post("http://localhost:6080/comprehension", data=json.dumps(payload), headers={'content-type':'application/json'})
+        #print("Response of API call: ", r.text)
+    except requests.exceptions.RequestException as e:
+        print(e)
+        pass
 
     response = {
         "dummyA": "reponseA",
         "dummyB": "reponseB"
     }
+
     return json.dumps(response), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=6070, debug=True)
-

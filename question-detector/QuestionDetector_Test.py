@@ -3,19 +3,47 @@
 """
 import unittest
 import json
-import QuestionDetector
+
+import requests
+
+import json
+import pprint
+
+import unittest
+
+pp = pprint.PrettyPrinter(indent=2)
 
 
 class QuestionDetector_Test(unittest.TestCase):
-    def setUp(self):
-        self.question = QuestionDetector.QuestionDetector()
+    def test_question(self):
+        
+        payload = {
+            "params": "Can acupuncture help me loose weight?"
+        }
+        
+        print('\x1b[31m' + payload['params'] + '\x1b[0m')
 
-    def test_if_question(self):
-        params = ['Does some food increase pollen allergy symptoms?']
+        try:
+            r = requests.post("http://localhost:6060/questiondetector", data=json.dumps(payload), headers={'content-type':'application/json'}) 
+            
+        except requests.exceptions.RequestException as e:
+            print(e)
+            pass
 
-        response = self.question.predict(params, "features")
-        self.assertIsNotNone(response)
+    def test_non_question(self):
+        
+        payload = {
+            "params": "God is good."
+        }
+        
+        print('\x1b[31m' + payload['params'] + '\x1b[0m')
 
+        try:
+            resp = requests.post("http://localhost:6060/questiondetector", data=json.dumps(payload), headers={'content-type':'application/json'}) 
+            
+        except requests.exceptions.RequestException as e:
+            print(e)
+            pass
 
 if __name__ == '__main__':
     unittest.main()

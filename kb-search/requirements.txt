@@ -1,5 +1,5 @@
 Flask==1.0.2
 nltk==3.4.5
 numpy==1.17.4
+requests
 scikit-learn==0.22
-urllib3==1.24
