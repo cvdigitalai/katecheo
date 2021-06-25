@@ -24,7 +24,7 @@ class QuestionDetector_Test(unittest.TestCase):
         print('\x1b[31m' + payload['params'] + '\x1b[0m')
 
         try:
-            r = requests.post("http://localhost:6080/questiondetector", data=json.dumps(payload), headers={'content-type':'application/json'}) 
+            r = requests.post("http://localhost:6060/questiondetector", data=json.dumps(payload), headers={'content-type':'application/json'}) 
             
         except requests.exceptions.RequestException as e:
             print(e)
@@ -39,7 +39,7 @@ class QuestionDetector_Test(unittest.TestCase):
         print('\x1b[31m' + payload['params'] + '\x1b[0m')
 
         try:
-            resp = requests.post("http://localhost:6080/questiondetector", data=json.dumps(payload), headers={'content-type':'application/json'}) 
+            resp = requests.post("http://localhost:6060/questiondetector", data=json.dumps(payload), headers={'content-type':'application/json'}) 
             
         except requests.exceptions.RequestException as e:
             print(e)

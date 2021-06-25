@@ -57,5 +57,5 @@ def detect_question():
     return result
 
 if __name__=='__main__':
-    app.run('0.0.0.0', port=6080, debug=True )
+    app.run('0.0.0.0', port=6060, debug=True )
     #serve(app, host='0.0.0.0', port=6080)
