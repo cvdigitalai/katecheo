@@ -47,6 +47,7 @@ class KBSearch(object):
         ]
 
         knowledge_bases_raw_data = {}
+        base_dir = "/data/"
 
         # Iterate through the different knowledge bases.
         for kb in kb_info:
@@ -54,10 +55,10 @@ class KBSearch(object):
             kb_url = kb[1]
 
             # Download the knowledge base files.
-            urllib.request.urlretrieve(kb_url, os.path.basename(kb_url))
+            urllib.request.urlretrieve(kb_url, base_dir + os.path.basename(kb_url))
 
             # Load the downloaded JSON files.
-            with open(os.path.basename(kb_url)) as f:
+            with open(base_dir + os.path.basename(kb_url)) as f:
                 knowledge_bases_raw_data[topic] = json.load(f)
 
         # Iterate through each article from each topic and get only the
