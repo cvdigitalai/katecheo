@@ -7,17 +7,14 @@ import unittest
 import pprint
 import requests
 
-
-
-pp = pprint.PrettyPrinter(indent=2)
-
-
 class KBSearch_Test(unittest.TestCase):
     def test_topic_health(self):
         payload = {
             "params": "Can acupuncture help me loose weight?",
-            "tags": {
-                "question": True
+            "meta": {
+                "tags": {
+                    "question": True
+                }
             }
         }
 
@@ -30,12 +27,13 @@ class KBSearch_Test(unittest.TestCase):
             print(e)
             pass
 
-    '''
     def test_topic_faith(self):
         payload = {
             "params": "What about different Christian denominations?",
-            "tags": {
-                "question": True
+            "meta": {
+                "tags": {
+                    "question": True
+                }
             }
         }
 
@@ -48,7 +46,6 @@ class KBSearch_Test(unittest.TestCase):
         except requests.exceptions.RequestException as e:
             print(e)
             pass
-    '''
 
 if __name__ == '__main__':
     unittest.main()

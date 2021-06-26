@@ -7,4 +7,4 @@ RUN apt-get install python3.6 -y
 RUN apt-get install python3.6-dev -y
 RUN apt-get install python3-pip -y
 RUN pip3 install -r requirements.txt
-ENTRYPOINT python3 ReadingComp.py
+ENTRYPOINT python3 KBSearch.py

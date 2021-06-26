@@ -1,18 +1,12 @@
-"""
-KBSearch searches uses 'cosine similarity' to measure the similarity between
-a given phrase and an article from a knowledge base.
-"""
 from flask import Flask, Response, jsonify, request
-import json
-
-import os
-import re
 import copy
 import json
 import nltk
 import numpy as np
-import string
+import os
+import re
 import requests
+import string
 
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -23,13 +17,11 @@ nltk.download('stopwords')
 nltk.download('punkt')
 
 app = Flask(__name__)
-
 tfidf_vectorizer = None
 vectorized_knowledge_base = None
 common_knowledge_base = []
 common_knowledge_base_clean = []
 result = {}
-
 
 class KBSearch(object):
     """
@@ -116,7 +108,6 @@ class KBSearch(object):
             kb_content)
 
     def clean_text_and_remove_stopwords(self, text):
-
         # Remove punctuations
         text = re.sub('[%s]' % re.escape(string.punctuation), ' ', text)
 
@@ -135,7 +126,6 @@ class KBSearch(object):
         return text
 
     def get_matching_article(self, corpus, cos_similarity):
-
         max_cosine_similarity = 0
         article_index = 0
 
@@ -149,9 +139,8 @@ class KBSearch(object):
 
         return article_index, max_cosine_similarity
 
-    def predict(self, X, feature_names, meta):
-        if 'tags' in meta and 'question' in meta['tags'] and meta['tags'][
-                'question']:
+    def predict(self, X, feature_names, package):
+        if package and 'meta' in package and 'tags' in package['meta'] and 'question' in package['meta']['tags'] and package['meta']['tags']['question']:
 
             # Get the input message string.
             message_text = str(X[0]).lower()
@@ -171,75 +160,49 @@ class KBSearch(object):
                     os.environ['KATECHEO_SIMILARITY_THRESHOLD']):
 
                 # Retrieve the body of the matched article.
-                X = np.append(
-                    [self.common_knowledge_base[article_index]['content']], X)
-                self.result['on_topic'] = True
-                self.result['topic'] = self.common_knowledge_base[
-                    article_index]['topic']
-                self.result['article_id'] = self.common_knowledge_base[
-                    article_index][os.environ['KATECHEO_ARTICLE_ID']]
-                self.result['kb_search_error'] = ""
-                return X
+                X = np.append([self.common_knowledge_base[article_index]['content']], X)
+                package['meta']['tags']['on_topic'] = True
+                package['meta']['tags']['topic'] = self.common_knowledge_base[article_index]['topic']
+                package['meta']['tags']['article_id'] = self.common_knowledge_base[article_index][os.environ['KATECHEO_ARTICLE_ID']]
+                package['meta']['tags']['kb_search_error'] = ""
+                return X, package
             else:
-                self.result['on_topic'] = False
-                self.result['topic'] = ""
-                self.result['article_id'] = ""
-                self.result[
-                    'kb_search_error'] = 'Could not match "' + message_text + '" to any of the articles from the knowledge base'
-                return X
-        else:
-            self.result = meta['tags']
-            return X
+                package['meta']['tags']['on_topic'] = False
+                package['meta']['tags']['topic'] = ""
+                package['meta']['tags']['article_id'] = ""
+                package['meta']['tags']['kb_search_error'] = 'Could not match "' + message_text + '" to any of the articles from the knowledge base'
+                return X, package
 
+        package['meta']['tags']['kb_search_error'] = 'Not enough meta data to proceed'
+        return X, package
 
 kbs = KBSearch()
 
-
-
 @app.route('/kbsearch', methods=['POST'])
 def route_handler():
-    inbound = request.json
-
-    X = np.array([inbound['params']])
-    meta = {
-        "tags": {
-            "question": inbound['tags']['question']
-        }
+    response = ""
+    X = np.array([request.json['params']])
+    package = {
+        "meta": request.json["meta"]
     }
 
-    retval = kbs.predict(X, None, meta)
-    print("retval: ", retval)
-    print("~~~~~ Type: ",type(retval))
+    retval = kbs.predict(X, None, package)
 
-    article = str(retval[0])
-    print("Response in retval:", article)
-    print("retval Response Type:", type(article))
+    package["params"] = [
+        retval[0][0],
+        request.json['params']
+    ]
 
-
-    payload = {
-            "params" : [
-                article,
-                inbound['tags']['question']
-            ],
-            "tags": {
-                "question": inbound['tags']['question'],
-                'on_topic': True
-            }
-        }
+    print("KBS package: ", package)
 
     try:
-        r = requests.post("http://localhost:6080/comprehension", data=json.dumps(payload), headers={'content-type':'application/json'})
-        #print("Response of API call: ", r.text)
+        r = requests.post("http://localhost:6080/comprehension", data=json.dumps(package), headers={'content-type':'application/json'})
+        response = r.text
     except requests.exceptions.RequestException as e:
         print(e)
         pass
 
-    response = {
-        "dummyA": "reponseA",
-        "dummyB": "reponseB"
-    }
-
-    return json.dumps(response), 200
+    return response, 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=6070, debug=True)

@@ -1,4 +1,8 @@
 from flask import Flask, request
+import json
+import requests
+
+app = Flask(__name__)
 
 class QuestionID:
     """
@@ -35,26 +39,31 @@ class QuestionID:
         else:
             return False
 
-
-app = Flask(__name__)
-
 model = QuestionID()
-
 
 @app.route('/questiondetector', methods=['POST'])
 def detect_question():
-    inbound = request.json
-    result={}
-    question = model.predict(inbound["params"])
-    
-    if question:
-        result['question'] = True
-        result['question_detector_error'] = ''
-    else:
-        result['question'] = False
-        result['question_detector_error'] = 'This is not a question'
-    
-    return result
+    response = ""
+    is_question = model.predict(request.json["params"])
+
+    payload = {
+        "params": request.json["params"],
+        "meta": {
+            "tags": {
+                "question": is_question,
+                "question_detector_error": "" if is_question else "This is not a question"
+            }
+        }
+    }
+
+    try:
+        r = requests.post("http://kbsearch:6070/kbsearch", data=json.dumps(payload), headers={'content-type':'application/json'})
+        response = r.text
+    except requests.exceptions.RequestException as e:
+        print(e)
+        pass
+
+    return response, 200
 
 if __name__=='__main__':
     app.run('0.0.0.0', port=6060, debug=True )

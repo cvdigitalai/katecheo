@@ -3,23 +3,42 @@
 ## Build
 
 ```
-$ s2i build . seldonio/seldon-core-s2i-python37:1.7.0 cvdigital/question-detector:<TAG>
+$ docker build -t cvdigital/questiondetector:<TAG> .
 
-$ docker push cvdigital/question-detector:<TAG>
+$ docker push cvdigital/questiondetector:<TAG>
 ```
 
 ## Test
 
 ```
-$ docker run --name "question-detector" --rm cvdigital/question-detector:<TAG>
+$ docker run -d -p 6060:6060 --network="ice-net" --name "questiondetector" cvdigital/questiondetector:<TAG>
 
-# docker exec -it question-detector python QuestionDetector_Test.py
+# docker exec -it questiondetector python3 QuestionDetector_Test.py
 ```
 
 ## Usage
 
 ```
-$ docker run --name "question-detector" --rm -p 5001:5000 cvdigital/question-detector:<TAG>
+$ docker run -d -p 6060:6060 --network="ice-net" --name "questiondetector" cvdigital/questiondetector:<TAG>
 
-$ curl -g http://localhost:5001/predict --data-urlencode 'json={"data": {"names": ["message"], "ndarray": ["Does some food increase pollen allergy symptoms?"]}}'
+$ curl -X POST -H 'Content-Type: application/json' -d '{"params": "Can acupuncture help me loose weight?"}' http://localhost:6060/questiondetector
+```
+
+## Develop
+
+- **Prep**
+
+  `docker network ls, docker network create -d bridge ice-net`
+
+- **Install**
+
+  `$ pip3 install -r requirements.py`
+
+- **Start in local environment**
+
+  `$ python3.6 QuestionDetector.py`
+
+- **Unit test**
+
+  `$ python3.6 QuestionDetector_Test.py`
 ```
