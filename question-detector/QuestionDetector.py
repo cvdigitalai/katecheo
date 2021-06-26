@@ -57,7 +57,7 @@ def detect_question():
     }
 
     try:
-        r = requests.post("http://kbsearch:6070/kbsearch", data=json.dumps(payload), headers={'content-type':'application/json'})
+        r = requests.post("http://localhost:6070/kbsearch", data=json.dumps(payload), headers={'content-type':'application/json'})
         response = r.text
     except requests.exceptions.RequestException as e:
         print(e)

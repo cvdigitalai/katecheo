@@ -62,14 +62,14 @@ class KBSearch(object):
             # Download the knowledge base files.
             try:
                 r = requests.get(kb_url, allow_redirects=True)
-                open(os.path.basename(kb_url), 'wb').write(r.content)
+                open("/kb_data/" + os.path.basename(kb_url), 'wb').write(r.content)
             except requests.exceptions.RequestException as e:
                 print("Error in downloading KB URL")
                 print(e)
                 return
 
             # Load the downloaded JSON files.
-            with open(os.path.basename(kb_url)) as f:
+            with open("/kb_data/" + os.path.basename(kb_url)) as f:
                 knowledge_bases_raw_data[topic] = json.load(f)
 
         # Iterate through each article from each topic and get only the
