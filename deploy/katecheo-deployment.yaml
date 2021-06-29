@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: katecheo-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: katecheo-dep
+  template:
+    metadata:
+      labels:
+        app: katecheo-dep
+    spec:
+      containers:
+        - name: comprehension
+          image: cvdigital/comprehension:v0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6080
+          envFrom:
+          - configMapRef:
+              name: katecheo-configmap # Should match the name of the ConfigMap in RH
+        - name: kbsearch
+          image: cvdigital/kbsearch:v0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6070
+          envFrom:
+          - configMapRef:
+              name: katecheo-configmap # Should match the name of the ConfigMap in RH
+        - name: questiondetector
+          image: cvdigital/questiondetector:v0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6060
+          envFrom:
+          - configMapRef:
+              name: katecheo-configmap # Should match the name of the ConfigMap in RH

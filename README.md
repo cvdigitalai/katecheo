@@ -8,11 +8,9 @@ Check out [this screencast](https://youtu.be/dyhkLuq4Lo8) to see Katecheo in act
 
 ### System Prerequisites
 
-Katecheo runs on Kubernetes and utilizes Seldon to serve predictions. You will need:
+Katecheo runs on Kubernetes to serve predictions. Our tests were done on the OpenShift platform. To run Katecheo, you will need:
 
 - A Kubernetes cluster (see [here](https://kubernetes.io/docs/home/) for more information)
-- Seldon deployed on the Kubernetes cluster (see [here](https://docs.seldon.io/projects/seldon-core/en/latest/workflow/install.html) for more info about Seldon)
-- Ambassator or Istio installed on the Kubernetes cluster (see [here](https://docs.seldon.io/projects/seldon-core/en/latest/workflow/install.html#install-an-ingress-gateway) for more info)
 
 ### Data/model Preparation
 
@@ -22,44 +20,25 @@ To match topical questions with appropriate knowledge base articles, Katecheo re
 
 1. Clone this repo.
 
-2. Move into the deploy directory and copy the template configuration file:
+2. Ensure that `kubectl` connects to your cluster
+
+3. Apply configuration information to the cluster
 
     ```
-    $ cd deploy && cp config.template.json config.json
+    $ kubectl apply -f ./deploy/katecheo-config-map.yaml
     ```
 
-3. Modify the `config.json` file according to your deployment by, at the minimum, filling in the links to your knowledge base article files and the field names representing your article IDs, article titles, and article bodies in the article files. You can also optionally modify the similarity threshold used by Katecheo when matching quesitons to articles and the comprehension model used by Katecheo (either `bert` or `bidaf`). When you are done, the config file should look something like the following (for a scenario when we are enabling Q&A in two topics: _Christianity_ and _Medical Sciences_):
+4. Create the resources for the deployment
 
     ```
-    {
-        "article_id": "title",
-        "article_title_key": "title",
-        "article_body_key": "body",
-        "article_similarity_threshold": "0.15",
-        "comprehension_model": "bert",
-        "model": [
-            {
-                "name": "Christianity",
-                "kb_file": "https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_christianity_small.json"
-            },
-            {
-                "name": "Medical Sciences",
-                "kb_file": "https://storage.googleapis.com/pachyderm-neuralbot/knowledge_bases/kb_medical_small.json"
-            }
-        ]
-    }
+    $ kubectl apply -f ./deploy/katecheo-deployment.yaml
     ```
 
-4. Make sure your local `kubectl` is connected to your cluster.
-
-5. Run the deploy script.
+5. Allow access to the deployment
 
     ```
-    $ ./deploy.sh
+    $ kubectl apply -f ./deploy/katecheo-svc.yaml
     ```
-    
-6. This will deploy all of the Katecheo modules to your cluster. Once the Katecheo pod is in a `running` state, you will be able to serve multi-topic answers at the following endpoint: `http://<ingress IP>/seldon/default/katecheo/api/v0.1/predictions`. You can usually find the `<ingress IP>` using the `kubectl get svc` command and looking for the public IP for, e.g., ambassador. 
-
 ## Usage
 
 ### Via REST API 
@@ -67,7 +46,7 @@ To match topical questions with appropriate knowledge base articles, Katecheo re
 Example request (Question):
 
 ```
-$ curl -X POST -H 'Content-Type: application/json' -d '{"data": {"names": ["message"], "ndarray": ["How should you treat people with high risk factors for coronary heart disease?"]}}' http://<ingress IP>/seldon/default/katecheo/api/v0.1/predictions
+$ curl -X POST -H 'Content-Type: application/json' -d '{"params": "Can acupuncture help me loose weight?"}' https://katecheo-route-katecheo.apps.ice-staging.cfdf.p2.openshiftapps.com/questiondetector
 ```
 
 Example response (Answer):
@@ -75,29 +54,18 @@ Example response (Answer):
 ```
 {
   "meta": {
-    "puid": "lftagepuvbpskvhaudpb4a8b14",
     "tags": {
-      "article_id": "Can Prediabetes cause coronary heart disease?",
+      "article_id": "http://answers.webmd.com/answers/5074670/does-acupuncture-aid-weight-loss",
       "comprehension_error": "",
       "comprehension_model": "BERT",
       "kb_search_error": "",
       "on_topic": true,
       "question": true,
       "question_detector_error": "",
-      "topic": "Medical Sciences"
-    },
-    "routing": {
-      "question-detector": -1,
-      "kb-search": -1
-    },
-    "requestPath": {
-      "question-detector": "cvdigital/question-detector:v0.2.0",
-      "comprehension": "cvdigital/reading_comp:v0.2.0",
-      "kb-search": "cvdigital/kb_search:v0.2.0"
-    },
-    "metrics": []
+      "topic": "health"
+    }
   },
-  "strData": "aspirin and/or statins"
+  "strData": "acupuncture works by targeting pressure points linked to appetite and hunger"
 }
 ```
 
