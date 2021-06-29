@@ -7,7 +7,7 @@ This is demo web app (powered by [Streamlit](https://streamlit.io)) that demonst
 The easiest way to run the app is via Docker. Run the following command replacing `<Katecheo IP>` with the IP of your Katecheo deployment:
 
 ```
-$ docker run -it -p 8501:8501 --env KATECHEO_URL="http://<Katecheo IP>/seldon/default/katecheo/api/v0.1/predictions" cvdigital/katecheo-demo:v0.2.0
+$ docker run -it -p 8501:8501 --env KATECHEO_URL="<KATECHEO URL>" cvdigital/katecheo-demo:v0.2.1
 ```
 
 You can then navigate to `http://<your IP, e.g., localhost>:8501` to interact with the app.
@@ -29,5 +29,5 @@ $ cd katecho/demo/
 Build the docker image:
 
 ```
-$ docker build -t katecheo-demo .
+$ docker build -t cvdigital/katecheo-demo:<VERSION> .
 ```

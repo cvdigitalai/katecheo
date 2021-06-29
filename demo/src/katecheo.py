@@ -23,10 +23,7 @@ with st.spinner('Wait for it...'):
         katecheo_req = requests.post(
             os.environ["KATECHEO_URL"],
             data=json.dumps({
-                "data" : {
-                    "names": ["message"],
-                    'ndarray': [question]
-                }
+                "params" : question
             }),
             headers={"content-type": "application/json"}
         )
